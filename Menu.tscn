@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://dg6ecfu3eejrn"]
+
+[ext_resource type="Script" uid="uid://i2n21bxrbvt3" path="res://Menu.cs" id="1_uubjt"]
+
+[node name="Menu" type="Node2D"]
+script = ExtResource("1_uubjt")
+
+[node name="Arcade" type="Button" parent="."]
+offset_right = 960.0
+offset_bottom = 540.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 180
+text = "Arcade"
+
+[node name="Online" type="Button" parent="."]
+offset_left = 960.0
+offset_right = 1920.0
+offset_bottom = 540.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 180
+text = "Online"
+
+[node name="Build" type="Button" parent="."]
+offset_top = 540.0
+offset_right = 960.0
+offset_bottom = 1080.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 180
+text = "Build"
+
+[node name="Settings" type="Button" parent="."]
+offset_left = 960.0
+offset_top = 540.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 180
+text = "Settings"

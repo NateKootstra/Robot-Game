@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 
@@ -30,7 +31,7 @@ public partial class Parts : Node2D
         public double min = min;
         public double max = max;
     }
-    public class Part(int id, string name, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, bool> booleanTriggers, Dictionary<string, IntegerTrigger> integerTriggers, Dictionary<string, DoubleTrigger> doubleTriggers, Action<Part> onTick)
+    public class Part(int id, string name, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, bool> booleanTriggers, Dictionary<string, IntegerTrigger> integerTriggers, Dictionary<string, DoubleTrigger> doubleTriggers, Action<Part, ArrayList> onTick)
     {
         public int id = id;
         public string name = name;
@@ -41,7 +42,7 @@ public partial class Parts : Node2D
         public Dictionary<string, bool> booleanTriggers = booleanTriggers;
         public Dictionary<string, IntegerTrigger> integerTriggers = integerTriggers;
         public Dictionary<string, DoubleTrigger> doubleTriggers = doubleTriggers;
-        public Action<Part> onTick = onTick;
+        public Action<Part, ArrayList> onTick = onTick;
 
         public Vector2I location = new(-1, -1);
         public int rotation = 0;
@@ -79,16 +80,14 @@ public partial class Parts : Node2D
         }
     }
 
-    public static void GenericOnTick(int tickRate, Part self)
+    public static void GenericOnTick(int tickRate, Part self, ArrayList args)
     {
         self.tickCooldown = tickRate - 1;
-        GD.Print(self.name);
     }
 
-    public static void SwerveModuleOnTick(int tickRate, Part self)
+    public static void SwerveModuleOnTick(int tickRate, Part self, ArrayList args)
     {
         self.tickCooldown = tickRate - 1;
-        GD.Print(self.name);
     }
 
     public readonly List<Part> partList = [
@@ -100,7 +99,7 @@ public partial class Parts : Node2D
                     [],
                     [],
                     [],
-                    (part) => GenericOnTick(60, part)),
+                    (part, args) => GenericOnTick(60, part, args)),
         new Part(   1, "Bumper Corner",
                     true,
                     new(0, 0),
@@ -109,7 +108,7 @@ public partial class Parts : Node2D
                     [],
                     [],
                     [],
-                    (part) => GenericOnTick(60, part)),
+                    (part, args) => GenericOnTick(60, part, args)),
         new Part(   2, "Bumper Side",
                     true,
                     new(0, 0),
@@ -118,7 +117,7 @@ public partial class Parts : Node2D
                     [],
                     [],
                     [],
-                    (part) => GenericOnTick(60, part)),
+                    (part, args) => GenericOnTick(60, part, args)),
         new Part(   3, "Metal",
                     false,
                     new(0, 0),
@@ -127,7 +126,7 @@ public partial class Parts : Node2D
                     [],
                     [],
                     [],
-                    (part) => GenericOnTick(60, part)),
+                    (part, args) => GenericOnTick(60, part, args)),
         new Part(   4, "Swerve Module",
                     true,
                     new(1, 1),
@@ -136,7 +135,7 @@ public partial class Parts : Node2D
                     [],
                     [],
                     new(){{ "Speed", new(-1, 1) }, { "Direction", new (0, 360) }},
-                    (part) => SwerveModuleOnTick(1, part)),
+                    (part, args) => SwerveModuleOnTick(1, part, args)),
     ];
 
     public void UpdateRobot()

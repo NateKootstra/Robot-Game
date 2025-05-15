@@ -1,27 +1,27 @@
 [gd_scene load_steps=12 format=4 uid="uid://vgpkliqphujq"]
 
-[ext_resource type="Texture2D" uid="uid://ek7y6a33em6j" path="res://sprites/Field.png" id="1_myinc"]
-[ext_resource type="Texture2D" uid="uid://d0w4ckosrqxv0" path="res://sprites/Robot Game/Base/Corner.png" id="2_8tn2x"]
-[ext_resource type="Script" uid="uid://tgluiooluo50" path="res://Robot.cs" id="2_ivycn"]
-[ext_resource type="Texture2D" uid="uid://bdtp4l88w81jl" path="res://sprites/Robot Game/Base/Side.png" id="3_aq4fw"]
-[ext_resource type="Texture2D" uid="uid://clta2xqmssfp4" path="res://sprites/Robot Game/Base/Metal.png" id="4_ivycn"]
-[ext_resource type="Texture2D" uid="uid://drwu60qp8ys54" path="res://sprites/Robot Game/Modules/Swerve Module.png" id="5_aq4fw"]
+[ext_resource type="Texture2D" uid="uid://ek7y6a33em6j" path="res://sprites/Field.png" id="1_82stj"]
+[ext_resource type="Script" uid="uid://tgluiooluo50" path="res://Robot.cs" id="2_khq6o"]
+[ext_resource type="Texture2D" uid="uid://d0w4ckosrqxv0" path="res://sprites/Robot Game/Base/Corner.png" id="3_qo8q5"]
+[ext_resource type="Texture2D" uid="uid://bdtp4l88w81jl" path="res://sprites/Robot Game/Base/Side.png" id="4_gna1g"]
+[ext_resource type="Texture2D" uid="uid://clta2xqmssfp4" path="res://sprites/Robot Game/Base/Metal.png" id="5_v4nrk"]
+[ext_resource type="Texture2D" uid="uid://drwu60qp8ys54" path="res://sprites/Robot Game/Modules/Swerve Module.png" id="6_my7yy"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ivycn"]
 resource_name = "Bumper"
-texture = ExtResource("2_8tn2x")
+texture = ExtResource("3_qo8q5")
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q1uvj"]
-texture = ExtResource("3_aq4fw")
+texture = ExtResource("4_gna1g")
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qs82m"]
-texture = ExtResource("4_ivycn")
+texture = ExtResource("5_v4nrk")
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_c4vo5"]
-texture = ExtResource("5_aq4fw")
+texture = ExtResource("6_my7yy")
 0:0/0 = 0
 1:0/0 = 0
 0:1/0 = 0
@@ -38,27 +38,17 @@ sources/3 = SubResource("TileSetAtlasSource_c4vo5")
 
 [node name="Test" type="Node2D"]
 
-[node name="UI" type="Node2D" parent="."]
-
-[node name="RichTextLabel" type="RichTextLabel" parent="UI"]
-offset_left = 20.0
-offset_right = 420.0
-offset_bottom = 109.0
-theme_override_font_sizes/normal_font_size = 90
-bbcode_enabled = true
-text = "BACK"
-
 [node name="Field" type="Node2D" parent="."]
 
 [node name="Image" type="Sprite2D" parent="Field"]
 scale = Vector2(1.288, 1.288)
-texture = ExtResource("1_myinc")
+texture = ExtResource("1_82stj")
 centered = false
 offset = Vector2(0, 86.5)
 
 [node name="Robot" type="Node2D" parent="."]
 position = Vector2(250, 450)
-script = ExtResource("2_ivycn")
+script = ExtResource("2_khq6o")
 
 [node name="Tiles" type="TileMapLayer" parent="Robot"]
 scale = Vector2(0.4, 0.4)
