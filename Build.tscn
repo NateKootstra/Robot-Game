@@ -1,0 +1,60 @@
+[gd_scene load_steps=11 format=4 uid="uid://bp2rvl8d3v3j0"]
+
+[ext_resource type="Texture2D" uid="uid://d0w4ckosrqxv0" path="res://sprites/Robot Game/Base/Corner.png" id="1_m507v"]
+[ext_resource type="Texture2D" uid="uid://bdtp4l88w81jl" path="res://sprites/Robot Game/Base/Side.png" id="2_dne6j"]
+[ext_resource type="Texture2D" uid="uid://clta2xqmssfp4" path="res://sprites/Robot Game/Base/Metal.png" id="3_4076e"]
+[ext_resource type="Texture2D" uid="uid://drwu60qp8ys54" path="res://sprites/Robot Game/Modules/Swerve Module.png" id="4_j2eep"]
+[ext_resource type="Script" uid="uid://4m0ul27bxnx2" path="res://Parts.cs" id="5_dne6j"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8uch7"]
+resource_name = "Bumper Corner"
+texture = ExtResource("1_m507v")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_eluow"]
+resource_name = "Bumper Side"
+texture = ExtResource("2_dne6j")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_yw58n"]
+texture = ExtResource("3_4076e")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xpaca"]
+texture = ExtResource("4_j2eep")
+0:0/0 = 0
+1:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_51fak"]
+sources/0 = SubResource("TileSetAtlasSource_8uch7")
+sources/1 = SubResource("TileSetAtlasSource_eluow")
+sources/2 = SubResource("TileSetAtlasSource_yw58n")
+sources/3 = SubResource("TileSetAtlasSource_xpaca")
+
+[node name="Build" type="Node2D"]
+
+[node name="Robot" type="Node2D" parent="."]
+position = Vector2(400, 670)
+
+[node name="Tiles" type="TileMapLayer" parent="Robot"]
+scale = Vector2(2.5, 2.5)
+tile_map_data = PackedByteArray("AAD3//f/AAAAAAAAAAD3//j/AQAAAAAAAAD3//n/AQAAAAAAAAD3//r/AQAAAAAAAAD3//v/AQAAAAAAAAD3//z/AQAAAAAAAAD3//3/AQAAAAAAAAD3////AQAAAAAAAAD3//7/AQAAAAAAAAD3/wAAAQAAAAAAAAD3/wEAAQAAAAAAAAD3/wIAAQAAAAAAAAD3/wMAAQAAAAAAAAD3/wQAAQAAAAAAAAD3/wUAAQAAAAAAAAD3/wYAAQAAAAAAAAD3/wcAAQAAAAAAAAD3/wgAAAAAAAAAAGD4/wgAAQAAAAAAAFD5/wgAAQAAAAAAAFD6/wgAAQAAAAAAAFD7/wgAAQAAAAAAAFD8/wgAAQAAAAAAAFD9/wgAAQAAAAAAAFD+/wgAAQAAAAAAAFD//wgAAQAAAAAAAFD4//f/AQAAAAAAAFD5//f/AQAAAAAAAFD6//f/AQAAAAAAAFD7//f/AQAAAAAAAFD8//f/AQAAAAAAAFD9//f/AQAAAAAAAFD+//f/AQAAAAAAAFD///f/AQAAAAAAAFAAAPf/AQAAAAAAAFABAPf/AQAAAAAAAFACAPf/AQAAAAAAAFADAPf/AQAAAAAAAFAEAPf/AQAAAAAAAFAFAPf/AQAAAAAAAFAGAPf/AQAAAAAAAFAHAPf/AQAAAAAAAFAAAAgAAQAAAAAAAFABAAgAAQAAAAAAAFACAAgAAQAAAAAAAFADAAgAAQAAAAAAAFAEAAgAAQAAAAAAAFAFAAgAAQAAAAAAAFAGAAgAAQAAAAAAAFAHAAgAAQAAAAAAAFAIAPf/AAAAAAAAAFAIAAgAAAAAAAAAADAIAAYAAQAAAAAAAAAIAAcAAQAAAAAAAAAIAPj/AQAAAAAAAAAIAPn/AQAAAAAAAAAIAPr/AQAAAAAAAAAIAPv/AQAAAAAAAAAIAPz/AQAAAAAAAAAIAP3/AQAAAAAAAAAIAP7/AQAAAAAAAAAIAP//AQAAAAAAAAAIAAAAAQAAAAAAAAAIAAEAAQAAAAAAAAAIAAIAAQAAAAAAAAAIAAMAAQAAAAAAAAAIAAQAAQAAAAAAAAAIAAUAAQAAAAAAAAD4//j/AgAAAAAAAAD4//r/AgAAAAAAAAD4//n/AgAAAAAAAAD4//v/AgAAAAAAAAD4//z/AgAAAAAAAAD4//3/AgAAAAAAAAD4//7/AgAAAAAAAAD4////AgAAAAAAAAD4/wAAAgAAAAAAAAD4/wEAAgAAAAAAAAD4/wIAAgAAAAAAAAD4/wMAAgAAAAAAAAD4/wQAAgAAAAAAAAD4/wUAAgAAAAAAAAD4/wYAAgAAAAAAAAD4/wcAAgAAAAAAAAD5/wcAAgAAAAAAAAD6/wcAAgAAAAAAAAD7/wcAAgAAAAAAAAD8/wcAAgAAAAAAAAD9/wcAAgAAAAAAAAD+/wcAAgAAAAAAAAD//wcAAgAAAAAAAAAAAAcAAgAAAAAAAAABAAcAAgAAAAAAAAACAAcAAgAAAAAAAAADAAcAAgAAAAAAAAAEAAcAAgAAAAAAAAAFAAcAAgAAAAAAAAAGAAcAAgAAAAAAAAAHAAcAAgAAAAAAAAAHAAYAAgAAAAAAAAAHAAUAAgAAAAAAAAAHAAQAAgAAAAAAAAAHAAMAAgAAAAAAAAAHAAIAAgAAAAAAAAAHAAEAAgAAAAAAAAAHAAAAAgAAAAAAAAAHAP//AgAAAAAAAAAHAP7/AgAAAAAAAAAHAP3/AgAAAAAAAAAHAPz/AgAAAAAAAAAHAPv/AgAAAAAAAAAHAPr/AgAAAAAAAAAHAPn/AgAAAAAAAAAHAPj/AgAAAAAAAAAGAPj/AgAAAAAAAAAFAPj/AgAAAAAAAAAEAPj/AgAAAAAAAAADAPj/AgAAAAAAAAACAPj/AgAAAAAAAAABAPj/AgAAAAAAAAAAAPj/AgAAAAAAAAD///j/AgAAAAAAAAD+//j/AgAAAAAAAAD9//j/AgAAAAAAAAD8//j/AgAAAAAAAAD7//j/AgAAAAAAAAD6//j/AgAAAAAAAAD5//j/AgAAAAAAAAA=")
+tile_set = SubResource("TileSet_51fak")
+
+[node name="Preview" type="TileMapLayer" parent="Robot"]
+scale = Vector2(2.5, 2.5)
+tile_set = SubResource("TileSet_51fak")
+
+[node name="Parts" type="Node2D" parent="."]
+script = ExtResource("5_dne6j")
+
+[node name="Tiles" type="TileMapLayer" parent="Parts"]
+position = Vector2(840, 310)
+scale = Vector2(2.5, 2.5)
+tile_map_data = PackedByteArray("AAAAAAAAAgAAAAAAAAAAAAIAAwAAAAAAAAAAAAMAAwAAAAEAAAABAAIAAwABAAAAAAABAAMAAwABAAEAAAABAAQAAwABAAIAAAACAAMAAwACAAEAAAACAAQAAwACAAIAAAA=")
+tile_set = SubResource("TileSet_51fak")
