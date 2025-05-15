@@ -30,10 +30,11 @@ public partial class Parts : Node2D
         public double min = min;
         public double max = max;
     }
-    public class Part(int id, string name, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, bool> booleanTriggers, Dictionary<string, IntegerTrigger> integerTriggers, Dictionary<string, DoubleTrigger> doubleTriggers, Action<Part> onTick)
+    public class Part(int id, string name, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, bool> booleanTriggers, Dictionary<string, IntegerTrigger> integerTriggers, Dictionary<string, DoubleTrigger> doubleTriggers, Action<Part> onTick)
     {
         public int id = id;
         public string name = name;
+        public bool directional = directional;
         public Vector2I origin = origin;
         public List<Vector2I> points = points;
         public double weight = weight;
@@ -91,7 +92,8 @@ public partial class Parts : Node2D
     }
 
     public readonly List<Part> partList = [
-        new Part(   0, "Bumper Corner",
+        new Part(   0, "Delete",
+                    false,
                     new(0, 0),
                     [new(0, 0)],
                     1,
@@ -99,7 +101,8 @@ public partial class Parts : Node2D
                     [],
                     [],
                     (part) => GenericOnTick(60, part)),
-        new Part(   1, "Bumper Side",
+        new Part(   1, "Bumper Corner",
+                    true,
                     new(0, 0),
                     [new(0, 0)],
                     1,
@@ -107,7 +110,8 @@ public partial class Parts : Node2D
                     [],
                     [],
                     (part) => GenericOnTick(60, part)),
-        new Part(   2, "Metal",
+        new Part(   2, "Bumper Side",
+                    true,
                     new(0, 0),
                     [new(0, 0)],
                     1,
@@ -115,7 +119,17 @@ public partial class Parts : Node2D
                     [],
                     [],
                     (part) => GenericOnTick(60, part)),
-        new Part(   3, "Swerve Module",
+        new Part(   3, "Metal",
+                    false,
+                    new(0, 0),
+                    [new(0, 0)],
+                    1,
+                    [],
+                    [],
+                    [],
+                    (part) => GenericOnTick(60, part)),
+        new Part(   4, "Swerve Module",
+                    true,
                     new(1, 1),
                     [new(0, 0), new(1, 0), new(0, 1), new(1, 1), new(2, 1), new(1, 2), new(2, 2)],
                     1,
@@ -140,8 +154,8 @@ public partial class Parts : Node2D
     public override void _Ready()
     {
         partsMap = this.GetChild<TileMapLayer>(0);
-        robotMap = this.GetParent().GetChild(0).GetChild<TileMapLayer>(0);
-        previewMap = this.GetParent().GetChild(0).GetChild<TileMapLayer>(1);
+        robotMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(0);
+        previewMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(1);
 
         var robotCells = robotMap.GetUsedCells();
         for (int i = 0; i < robotCells.Count; i++)
@@ -164,15 +178,15 @@ public partial class Parts : Node2D
             rotation += 1;
             if (rotation > 3)
                 rotation = 0;
-            if (!(selectedPart == -1))
-                partList[selectedPart].rotation = rotation;
+            if (selectedPart > 0)
+                partList[selectedPart].rotation = partList[selectedPart].directional ? rotation : 0;
         }
         if (Input.IsActionJustPressed("LMB"))
         {
             Vector2I robotLocation = robotMap.LocalToMap(robotMap.ToLocal(GetGlobalMousePosition()));
             if (robotLocation.X >= -8 && robotLocation.Y >= -8 && robotLocation.X <= 7 && robotLocation.Y <= 7)
             {
-                if (!(selectedPart == -1))
+                if (selectedPart > 0)
                 {
                     bool valid = true;
                     for (int i = 0; i < partList[selectedPart].GetPoints().Count; i++)
@@ -203,30 +217,31 @@ public partial class Parts : Node2D
                 }
                 else
                 {
-                    if (!(robotMap.GetCellSourceId(robotLocation) == -1))
-                    {
-                        for (int i = 0; i < robot.Count; i++)
+                    if (selectedPart == 0)
+                        if (!(robotMap.GetCellSourceId(robotLocation) == -1))
                         {
-                            bool marked = false;
-                            for (int i2 = 0; i2 < robot[i].GetPoints().Count; i2++)
-                                if ((robot[i].location + robot[i].GetPoints()[i2] - robot[i].origin) == robotLocation)
-                                    marked = true;
-                            if (marked)
-                                robot.RemoveAt(i);
+                            for (int i = 0; i < robot.Count; i++)
+                            {
+                                bool marked = false;
+                                for (int i2 = 0; i2 < robot[i].GetPoints().Count; i2++)
+                                    if ((robot[i].location + robot[i].GetPoints()[i2] - robot[i].origin) == robotLocation)
+                                        marked = true;
+                                if (marked)
+                                    robot.RemoveAt(i);
+                            }
                         }
-                    }
                 }
                 UpdateRobot();
             }
-            else if (robotLocation.X < -8 || robotLocation.Y < -8 || robotLocation.X > 7 || robotLocation.Y > 7)
+            else if (robotLocation.X < -9 || robotLocation.Y < -9 || robotLocation.X > 8 || robotLocation.Y > 8)
             {
                 selectedPart = partsMap.GetCellSourceId(partsMap.LocalToMap(partsMap.ToLocal(GetGlobalMousePosition())));
-                if (!(selectedPart == -1))
-                    partList[selectedPart].rotation = rotation;
+                if (selectedPart > 0)
+                    partList[selectedPart].rotation = partList[selectedPart].directional ? rotation : 0;
             }
         }
         previewMap.Clear();
-        if (!(selectedPart == -1))
+        if (selectedPart > -1)
             for (int i = 0; i < partList[selectedPart].GetPoints().Count; i++)
             {
                 Vector2I previewLocation = previewMap.LocalToMap(previewMap.ToLocal(GetGlobalMousePosition())) + partList[selectedPart].GetPoints()[i] - partList[selectedPart].origin;
