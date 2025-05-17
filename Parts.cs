@@ -2,7 +2,8 @@ using Godot;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.IO;
+using System.Linq;
 
 public partial class Parts : Node2D
 {
@@ -18,6 +19,8 @@ public partial class Parts : Node2D
 
     private int selectedPart = -1;
     private int rotation = 0;
+    private string selectedBot = "";
+
     public List<Part> robot = [];
 
 
@@ -152,21 +155,30 @@ public partial class Parts : Node2D
 
     public override void _Ready()
     {
+        String[] robots = DirAccess.GetFilesAt("user://robots");
+
+
+        // if (!robots.Contains(selectedBot + ".robot"))
+        //     selectedBot = robots[0]
+
         partsMap = this.GetChild<TileMapLayer>(0);
         robotMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(0);
         previewMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(1);
 
-        var robotCells = robotMap.GetUsedCells();
-        for (int i = 0; i < robotCells.Count; i++)
-            if (Math.Abs(robotCells[i].X) < 10 && Math.Abs(robotCells[i].Y) < 10 && !(robotMap.GetCellSourceId(robotCells[i]) == -1))
-            {
-                if (robotMap.GetCellAtlasCoords(robotCells[i]) == partList[robotMap.GetCellSourceId(robotCells[i])].origin)
+        if (robots.Length == 0)
+        {
+            var robotCells = robotMap.GetUsedCells();
+            for (int i = 0; i < robotCells.Count; i++)
+                if (Math.Abs(robotCells[i].X) < 10 && Math.Abs(robotCells[i].Y) < 10 && !(robotMap.GetCellSourceId(robotCells[i]) == -1))
                 {
-                    robot.Add(partList[robotMap.GetCellSourceId(robotCells[i])].Copy());
-                    robot[^1].location = robotCells[i];
-                    robot[^1].rotation = rotations.IndexOf(robotMap.GetCellAlternativeTile(robotCells[i]));
+                    if (robotMap.GetCellAtlasCoords(robotCells[i]) == partList[robotMap.GetCellSourceId(robotCells[i])].origin)
+                    {
+                        robot.Add(partList[robotMap.GetCellSourceId(robotCells[i])].Copy());
+                        robot[^1].location = robotCells[i];
+                        robot[^1].rotation = rotations.IndexOf(robotMap.GetCellAlternativeTile(robotCells[i]));
+                    }
                 }
-            }
+        }
         UpdateRobot();
     }
 

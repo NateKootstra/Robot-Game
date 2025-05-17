@@ -113,3 +113,19 @@ tile_set = SubResource("TileSet_51fak")
 [node name="Preview" type="TileMapLayer" parent="Robot"]
 scale = Vector2(2.5, 2.5)
 tile_set = SubResource("TileSet_51fak")
+
+[node name="UI" type="Node2D" parent="."]
+
+[node name="OptionButton" type="OptionButton" parent="UI"]
+offset_left = 45.0
+offset_top = 100.0
+offset_right = 755.0
+offset_bottom = 204.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 80
+selected = 0
+item_count = 2
+popup/item_0/text = "Kitbot"
+popup/item_0/id = 0
+popup/item_1/text = "New"
+popup/item_1/id = 1

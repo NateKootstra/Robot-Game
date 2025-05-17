@@ -47,7 +47,7 @@ public partial class Robot : Node2D
 
     public override void _Process(double delta)
     {
-        double speed = 0.1;
+        double speed = 0;
 
         List<List<double>> wheels = [];
         var swerveTiles = map.GetUsedCellsById(3);
