@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://p2gdt08e7w0r"
-path="res://.godot/imported/Doto-SemiBold.ttf-5fe2147e796857f129b34c8a736ebee4.fontdata"
+uid="uid://dgdt41q56urc1"
+path="res://.godot/imported/SourceCodePro-VariableFont_wght.ttf-2896d32b47e1ab806c91833799c3faab.fontdata"
 
 [deps]
 
-source_file="res://Doto-SemiBold.ttf"
-dest_files=["res://.godot/imported/Doto-SemiBold.ttf-5fe2147e796857f129b34c8a736ebee4.fontdata"]
+source_file="res://SourceCodePro-VariableFont_wght.ttf"
+dest_files=["res://.godot/imported/SourceCodePro-VariableFont_wght.ttf-2896d32b47e1ab806c91833799c3faab.fontdata"]
 
 [params]
 

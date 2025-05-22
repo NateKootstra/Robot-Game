@@ -11,7 +11,6 @@ public partial class Menu : Node2D
         tree = GetTree();
         for (int i = 0; i < GetChildren().Count; i++)
         {
-            GD.Print(GetChild<Button>(i).Name);
             string scene = GetChild<Button>(i).Name;
             GetChild<Button>(i).ButtonUp += () => ChangeScene(scene);
         }

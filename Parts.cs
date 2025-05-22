@@ -2,39 +2,192 @@ using Godot;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
-public partial class Parts : Node2D
+[GlobalClass]
+public partial class Parts : Node
 {
-    public readonly List<int> rotations = [
+    public static readonly List<int> rotations = [
         0,
         (int)(TileSetAtlasSource.TransformTranspose + TileSetAtlasSource.TransformFlipH),
         (int)(TileSetAtlasSource.TransformFlipH + TileSetAtlasSource.TransformFlipV),
         (int)(TileSetAtlasSource.TransformTranspose + TileSetAtlasSource.TransformFlipV)
     ];
-    TileMapLayer partsMap;
-    TileMapLayer robotMap;
-    TileMapLayer previewMap;
 
-    private int selectedPart = -1;
-    private int rotation = 0;
-    private string selectedBot = "";
+    // Bindings should look like these:
+    // Trigger Speed     =  Number 0
+    // Memory  AND       =  Number 0
+    // Key    W   = Number 1 -> Trigger Speed     += Number 1
+    // Key    S   = Number 1 -> Trigger Speed     -= Number 1
+    // Key    H   = Number 0 -> Memory  AND       += Number 1
+    // Key    J   = Number 0 -> Memory  AND       += Number 1
+    // Memory AND < Number 2 -> Memory  AND       =  Number 0
+    // Memory AND = Number 2 -> Memory  AND       =  Number 1
+    // Memory AND = Key    R -> Trigger Direction =  Number 360
+    public class Binding()
+    {
+        public bool comparison = true;
+        public List<int> types = [2, 3, 0, 3];
+        public List<string> inputs = ["W", "1", "Forward", "1"];
+        public List<string> operands = ["=", "="];
 
-    public List<Part> robot = [];
-
-
-    public class IntegerTrigger(int min, int max)
+        public void RunBinding(int robotIndex, int partIndex)
+        {
+            try
+            {
+                List<double> values = [];
+                for (int i = 0; i < 4; i++)
+                {
+                    if (!(i == 2))
+                        switch (types[i])
+                        {
+                            case 0:
+                                values.Add(Robots.list[robotIndex].memory[inputs[i]]);
+                                break;
+                            case 1:
+                                values.Add(Robots.list[robotIndex].parts[partIndex].triggers[inputs[i]].value);
+                                break;
+                            case 2:
+                                if (Input.IsPhysicalKeyPressed(OS.FindKeycodeFromString(inputs[i])))
+                                    values.Add(1d);
+                                else
+                                    values.Add(0d);
+                                break;
+                            case 3:
+                                values.Add(double.Parse(inputs[i], System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+                        }
+                }
+                if (comparison)
+                {
+                    bool comparisonResult = false;
+                    switch (operands[0])
+                    {
+                        case "=":
+                            comparisonResult = values[0] == values[1];
+                            break;
+                        case ">":
+                            comparisonResult = values[0] > values[1];
+                            break;
+                        case "<":
+                            comparisonResult = values[0] < values[1];
+                            break;
+                        case ">=":
+                            comparisonResult = values[0] >= values[1];
+                            break;
+                        case "<=":
+                            comparisonResult = values[0] <= values[1];
+                            break;
+                    }
+                    if (!comparisonResult)
+                        return;
+                }
+                switch (operands[1])
+                {
+                    case "=":
+                        if (types[2] == 0)
+                        {
+                            if (Robots.list[robotIndex].memory.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].memory[inputs[2]] = values[2];
+                            else
+                                Robots.list[robotIndex].memory.Add(inputs[2], values[2]);
+                        }
+                        else
+                        {
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] = values[2];
+                            else
+                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], values[2]);
+                        }
+                        break;
+                    case "+=":
+                        if (types[2] == 0)
+                        {
+                            if (Robots.list[robotIndex].memory.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].memory[inputs[2]] += values[2];
+                            else
+                                Robots.list[robotIndex].memory.Add(inputs[2], values[2]);
+                        }
+                        else
+                        {
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] += values[2];
+                            else
+                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], values[2]);
+                        }
+                        break;
+                    case "-=":
+                        if (types[2] == 0)
+                        {
+                            if (Robots.list[robotIndex].memory.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].memory[inputs[2]] -= values[2];
+                            else
+                                Robots.list[robotIndex].memory.Add(inputs[2], -values[2]);
+                        }
+                        else
+                        {
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] -= values[2];
+                            else
+                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], -values[2]);
+                        }
+                        break;
+                    case "*=":
+                        if (types[2] == 0)
+                        {
+                            if (Robots.list[robotIndex].memory.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].memory[inputs[2]] *= values[2];
+                            else
+                                Robots.list[robotIndex].memory.Add(inputs[2], 0);
+                        }
+                        else
+                        {
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] *= values[2];
+                            else
+                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], 0);
+                        }
+                        break;
+                    case "/=":
+                        if (types[2] == 0)
+                        {
+                            if (Robots.list[robotIndex].memory.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].memory[inputs[2]] /= values[2];
+                            else
+                                Robots.list[robotIndex].memory.Add(inputs[2], 0);
+                        }
+                        else
+                        {
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
+                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] /= values[2];
+                            else
+                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], 0);
+                        }
+                        break;
+                }
+            }
+            catch
+            {
+                return;
+            }
+        }
+    }
+    public class BooleanTrigger(bool value)
+    {
+        public bool value = value;
+    }
+    public class IntegerTrigger(int min, int max, int value)
     {
         public int min = min;
         public int max = max;
+        public int value = value;
     }
-    public class DoubleTrigger(double min, double max)
+    public class DoubleTrigger(double min, double max, double value)
     {
         public double min = min;
         public double max = max;
+        public double value = value;
     }
-    public class Part(int id, string name, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, bool> booleanTriggers, Dictionary<string, IntegerTrigger> integerTriggers, Dictionary<string, DoubleTrigger> doubleTriggers, Action<Part, ArrayList> onTick)
+    public class Part(int id, string name, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, dynamic> triggers, string onTick)
     {
         public int id = id;
         public string name = name;
@@ -42,14 +195,13 @@ public partial class Parts : Node2D
         public Vector2I origin = origin;
         public List<Vector2I> points = points;
         public double weight = weight;
-        public Dictionary<string, bool> booleanTriggers = booleanTriggers;
-        public Dictionary<string, IntegerTrigger> integerTriggers = integerTriggers;
-        public Dictionary<string, DoubleTrigger> doubleTriggers = doubleTriggers;
-        public Action<Part, ArrayList> onTick = onTick;
+        public Dictionary<string, dynamic> triggers = triggers;
+        public string onTick = onTick;
 
         public Vector2I location = new(-1, -1);
         public int rotation = 0;
         public int tickCooldown = 0;
+        public List<Binding> bindings = [];
 
         public List<Vector2I> GetPoints()
         {
@@ -83,184 +235,54 @@ public partial class Parts : Node2D
         }
     }
 
-    public static void GenericOnTick(int tickRate, Part self, ArrayList args)
-    {
-        self.tickCooldown = tickRate - 1;
-    }
+    public static readonly Dictionary<string, Action<Part, int, ArrayList>> tickActions = new(){
+        {"GenericOnTick", delegate(Part self, int robotID, ArrayList args) {
+            int cooldown = 60;
 
-    public static void SwerveModuleOnTick(int tickRate, Part self, ArrayList args)
-    {
-        self.tickCooldown = tickRate - 1;
-    }
+            self.tickCooldown = cooldown;
+        }},
+        {"SwerveModuleOnTick", delegate(Part self, int robotID, ArrayList args) {
+            int cooldown = 1;
 
-    public readonly List<Part> partList = [
+            self.tickCooldown = cooldown;
+        }},
+    };
+
+    public static readonly List<Part> partList = [
         new Part(   0, "Delete",
                     false,
                     new(0, 0),
                     [new(0, 0)],
                     1,
                     [],
-                    [],
-                    [],
-                    (part, args) => GenericOnTick(60, part, args)),
+                    "GenericOnTick"),
         new Part(   1, "Bumper Corner",
                     true,
                     new(0, 0),
                     [new(0, 0)],
                     1,
                     [],
-                    [],
-                    [],
-                    (part, args) => GenericOnTick(60, part, args)),
+                    "GenericOnTick"),
         new Part(   2, "Bumper Side",
                     true,
                     new(0, 0),
                     [new(0, 0)],
                     1,
                     [],
-                    [],
-                    [],
-                    (part, args) => GenericOnTick(60, part, args)),
+                    "GenericOnTick"),
         new Part(   3, "Metal",
                     false,
                     new(0, 0),
                     [new(0, 0)],
                     1,
                     [],
-                    [],
-                    [],
-                    (part, args) => GenericOnTick(60, part, args)),
+                    "GenericOnTick"),
         new Part(   4, "Swerve Module",
                     true,
                     new(1, 1),
                     [new(0, 0), new(1, 0), new(0, 1), new(1, 1), new(2, 1), new(1, 2), new(2, 2)],
                     1,
-                    [],
-                    [],
-                    new(){{ "Speed", new(-1, 1) }, { "Direction", new (0, 360) }},
-                    (part, args) => SwerveModuleOnTick(1, part, args)),
+                    new(){{ "Speed", new DoubleTrigger(-1, 1, 0) }, { "Dir", new DoubleTrigger(0, 360, 0) }},
+                    "GenericOnTick"),
     ];
-
-    public void UpdateRobot()
-    {
-        robotMap.Clear();
-        for (int i = 0; i < robot.Count; i++)
-        {
-            for (int i2 = 0; i2 < robot[i].GetPoints().Count; i2++)
-            {
-                robotMap.SetCell(robot[i].location + robot[i].GetPoints()[i2] - robot[i].origin, robot[i].id, robot[i].points[i2], rotations[robot[i].rotation]);
-            }
-        }
-    }
-
-    public override void _Ready()
-    {
-        String[] robots = DirAccess.GetFilesAt("user://robots");
-
-
-        // if (!robots.Contains(selectedBot + ".robot"))
-        //     selectedBot = robots[0]
-
-        partsMap = this.GetChild<TileMapLayer>(0);
-        robotMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(0);
-        previewMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(1);
-
-        if (robots.Length == 0)
-        {
-            var robotCells = robotMap.GetUsedCells();
-            for (int i = 0; i < robotCells.Count; i++)
-                if (Math.Abs(robotCells[i].X) < 10 && Math.Abs(robotCells[i].Y) < 10 && !(robotMap.GetCellSourceId(robotCells[i]) == -1))
-                {
-                    if (robotMap.GetCellAtlasCoords(robotCells[i]) == partList[robotMap.GetCellSourceId(robotCells[i])].origin)
-                    {
-                        robot.Add(partList[robotMap.GetCellSourceId(robotCells[i])].Copy());
-                        robot[^1].location = robotCells[i];
-                        robot[^1].rotation = rotations.IndexOf(robotMap.GetCellAlternativeTile(robotCells[i]));
-                    }
-                }
-        }
-        UpdateRobot();
-    }
-
-    public override void _Process(double delta)
-    {
-        if (Input.IsActionJustPressed("RotatePart"))
-        {
-            rotation += 1;
-            if (rotation > 3)
-                rotation = 0;
-            if (selectedPart > 0)
-                partList[selectedPart].rotation = partList[selectedPart].directional ? rotation : 0;
-        }
-        if (Input.IsActionJustPressed("LMB"))
-        {
-            Vector2I robotLocation = robotMap.LocalToMap(robotMap.ToLocal(GetGlobalMousePosition()));
-            if (robotLocation.X >= -8 && robotLocation.Y >= -8 && robotLocation.X <= 7 && robotLocation.Y <= 7)
-            {
-                if (selectedPart > 0)
-                {
-                    bool valid = true;
-                    for (int i = 0; i < partList[selectedPart].GetPoints().Count; i++)
-                    {
-                        Vector2I pointLocation = robotLocation + partList[selectedPart].GetPoints()[i] - partList[selectedPart].origin;
-                        GD.Print(pointLocation);
-                        if (pointLocation.X < -8 || pointLocation.Y < -8 || pointLocation.X > 7 || pointLocation.Y > 7)
-                            valid = false;
-                    }
-                    if (valid)
-                    {
-                        for (int i = 0; i < partList[selectedPart].GetPoints().Count; i++)
-                        {
-                            Vector2I pointLocation = robotLocation + partList[selectedPart].GetPoints()[i] - partList[selectedPart].origin;
-                            for (int i2 = 0; i2 < robot.Count; i2++)
-                            {
-                                bool marked = false;
-                                for (int i3 = 0; i3 < robot[i2].GetPoints().Count; i3++)
-                                    if ((robot[i2].location + robot[i2].GetPoints()[i3] - robot[i2].origin) == pointLocation)
-                                        marked = true;
-                                if (marked)
-                                    robot.RemoveAt(i2);
-                            }
-                        }
-                        robot.Add(partList[selectedPart].Copy());
-                        robot[^1].location = robotLocation;
-                    }
-                }
-                else
-                {
-                    if (selectedPart == 0)
-                        if (!(robotMap.GetCellSourceId(robotLocation) == -1))
-                        {
-                            for (int i = 0; i < robot.Count; i++)
-                            {
-                                bool marked = false;
-                                for (int i2 = 0; i2 < robot[i].GetPoints().Count; i2++)
-                                    if ((robot[i].location + robot[i].GetPoints()[i2] - robot[i].origin) == robotLocation)
-                                        marked = true;
-                                if (marked)
-                                    robot.RemoveAt(i);
-                            }
-                        }
-                }
-                UpdateRobot();
-            }
-            else if (robotLocation.X < -9 || robotLocation.Y < -9 || robotLocation.X > 8 || robotLocation.Y > 8)
-            {
-                selectedPart = partsMap.GetCellSourceId(partsMap.LocalToMap(partsMap.ToLocal(GetGlobalMousePosition())));
-                if (selectedPart > 0)
-                    partList[selectedPart].rotation = partList[selectedPart].directional ? rotation : 0;
-            }
-        }
-        previewMap.Clear();
-        if (selectedPart > -1)
-            for (int i = 0; i < partList[selectedPart].GetPoints().Count; i++)
-            {
-                Vector2I previewLocation = previewMap.LocalToMap(previewMap.ToLocal(GetGlobalMousePosition())) + partList[selectedPart].GetPoints()[i] - partList[selectedPart].origin;
-                if (previewLocation.X < -8 || previewLocation.Y < -8 || previewLocation.X > 7 || previewLocation.Y > 7)
-                    previewMap.Modulate = new Color(1, 0, 0, 0.5f);
-                else
-                    previewMap.Modulate = new Color(0, 1, 0, 0.5f);
-                previewMap.SetCell(previewLocation, partList[selectedPart].id, partList[selectedPart].points[i], rotations[partList[selectedPart].rotation]);
-            }
-    }
 }

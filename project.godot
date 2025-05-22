@@ -17,6 +17,11 @@ config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 boot_splash/bg_color=Color(0, 0, 0, 1)
 boot_splash/show_image=false
 
+[autoload]
+
+Parts="*res://Parts.cs"
+Robots="*res://Robots.cs"
+
 [display]
 
 window/size/viewport_width=1920
@@ -30,7 +35,7 @@ project/assembly_name="That-s not legal!"
 
 [gui]
 
-theme/custom_font="uid://p2gdt08e7w0r"
+theme/custom_font="uid://dgdt41q56urc1"
 theme/default_font_subpixel_positioning=0
 
 [input]
