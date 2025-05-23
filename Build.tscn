@@ -116,15 +116,35 @@ scale = Vector2(2.5, 2.5)
 tile_set = SubResource("TileSet_51fak")
 
 [node name="ConfigurePart" type="Node2D" parent="."]
+visible = false
+position = Vector2(840, 310)
 
 [node name="BG" type="Sprite2D" parent="ConfigurePart"]
-position = Vector2(880, 350)
+position = Vector2(40, 40)
 scale = Vector2(9.2, 6.4)
 texture = ExtResource("8_8uch7")
 centered = false
 
+[node name="Name" type="RichTextLabel" parent="ConfigurePart"]
+offset_left = 40.0
+offset_top = 20.0
+offset_right = 960.0
+offset_bottom = 100.0
+theme_override_font_sizes/normal_font_size = 60
+text = "Name"
+
+[node name="Coordinates" type="RichTextLabel" parent="ConfigurePart"]
+offset_left = 40.0
+offset_top = 20.0
+offset_right = 960.0
+offset_bottom = 100.0
+theme_override_font_sizes/normal_font_size = 60
+bbcode_enabled = true
+text = "[right](0, 0)"
+
 [node name="BindingPreset" type="Node2D" parent="ConfigurePart"]
-position = Vector2(840, 310)
+visible = false
+position = Vector2(0, 400)
 
 [node name="ConditionalToggle" type="CheckButton" parent="ConfigurePart/BindingPreset"]
 offset_top = 62.0
@@ -158,7 +178,7 @@ offset_right = 650.0
 offset_bottom = 120.0
 scale = Vector2(0.5, 0.5)
 theme_override_font_sizes/font_size = 80
-text = "="
+text = "=="
 
 [node name="Type1" type="Button" parent="ConfigurePart/BindingPreset/Conditional"]
 offset_left = 575.0

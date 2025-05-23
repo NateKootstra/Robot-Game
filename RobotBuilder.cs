@@ -14,6 +14,7 @@ public partial class RobotBuilder : Node2D
     private int selectedPart = -1;
     private int rotation = 0;
     private string selectedBot = "";
+    private Parts.Part viewedPart;
 
     public List<Parts.Part> robot = [];
 
@@ -102,30 +103,50 @@ public partial class RobotBuilder : Node2D
                         robot[^1].location = robotLocation;
                     }
                 }
-                else
+                if (!(robotMap.GetCellSourceId(robotLocation) == -1))
                 {
                     if (selectedPart == 0)
-                        if (!(robotMap.GetCellSourceId(robotLocation) == -1))
+                    {
+                        for (int i = 0; i < robot.Count; i++)
                         {
-                            for (int i = 0; i < robot.Count; i++)
-                            {
-                                bool marked = false;
-                                for (int i2 = 0; i2 < robot[i].GetPoints().Count; i2++)
-                                    if ((robot[i].location + robot[i].GetPoints()[i2] - robot[i].origin) == robotLocation)
-                                        marked = true;
-                                if (marked)
-                                    robot.RemoveAt(i);
-                            }
+                            bool marked = false;
+                            for (int i2 = 0; i2 < robot[i].GetPoints().Count; i2++)
+                                if ((robot[i].location + robot[i].GetPoints()[i2] - robot[i].origin) == robotLocation)
+                                    marked = true;
+                            if (marked)
+                                robot.RemoveAt(i);
                         }
+                    }
+                    else if (selectedPart == -1)
+                    {
+                        for (int i = 0; i < robot.Count; i++)
+                        {
+                            bool marked = false;
+                            for (int i2 = 0; i2 < robot[i].GetPoints().Count; i2++)
+                                if ((robot[i].location + robot[i].GetPoints()[i2] - robot[i].origin) == robotLocation)
+                                    marked = true;
+                            if (marked)
+                                viewedPart = robot[i];
+                        }
+                        GetParent().GetChild<Node2D>(3).GetChild<RichTextLabel>(1).Text = viewedPart.name;
+                        GetParent().GetChild<Node2D>(3).GetChild<RichTextLabel>(2).Text = "[right]" + (viewedPart.location + new Vector2I(8, 8)).ToString();
+                        GetParent().GetChild<Node2D>(3).Show();
+                    }
                 }
-                UpdateRobot();
+                else if (selectedPart == -1)
+                {
+                    GetParent().GetChild<Node2D>(3).Hide();
+                }
             }
-            else if (robotLocation.X < -9 || robotLocation.Y < -9 || robotLocation.X > 8 || robotLocation.Y > 8)
+            else if (robotLocation.X >= -9 && robotLocation.Y >= -9 && robotLocation.X <= 8 && robotLocation.Y <= 8)
+                GetParent().GetChild<Node2D>(3).Hide();
+            else if ((robotLocation.X < -9 || robotLocation.Y < -9 || robotLocation.X > 8 || robotLocation.Y > 8) && !GetParent().GetChild<Node2D>(3).Visible)
             {
                 selectedPart = partsMap.GetCellSourceId(partsMap.LocalToMap(partsMap.ToLocal(GetGlobalMousePosition())));
                 if (selectedPart > 0)
                     Parts.partList[selectedPart].rotation = Parts.partList[selectedPart].directional ? rotation : 0;
             }
+            UpdateRobot();
         }
         previewMap.Clear();
         if (selectedPart > -1)

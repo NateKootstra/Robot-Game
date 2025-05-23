@@ -26,8 +26,8 @@ public partial class Parts : Node
     public class Binding()
     {
         public bool comparison = true;
-        public List<int> types = [2, 3, 0, 3];
-        public List<string> inputs = ["W", "1", "Forward", "1"];
+        public List<int> types = [2, 2, 0, 2];
+        public List<string> inputs = ["0", "0", "", "0"];
         public List<string> operands = ["=", "="];
 
         public void RunBinding(int robotIndex, int partIndex)
@@ -47,13 +47,13 @@ public partial class Parts : Node
                                 values.Add(Robots.list[robotIndex].parts[partIndex].triggers[inputs[i]].value);
                                 break;
                             case 2:
+                                values.Add(double.Parse(inputs[i], System.Globalization.CultureInfo.InvariantCulture));
+                                break;
+                            case 3:
                                 if (Input.IsPhysicalKeyPressed(OS.FindKeycodeFromString(inputs[i])))
                                     values.Add(1d);
                                 else
                                     values.Add(0d);
-                                break;
-                            case 3:
-                                values.Add(double.Parse(inputs[i], System.Globalization.CultureInfo.InvariantCulture));
                                 break;
                         }
                 }
@@ -187,10 +187,11 @@ public partial class Parts : Node
         public double max = max;
         public double value = value;
     }
-    public class Part(int id, string name, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, dynamic> triggers, string onTick)
+    public class Part(int id, string name, int priority, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, dynamic> triggers, string onTick)
     {
         public int id = id;
         public string name = name;
+        public int priority = priority;
         public bool directional = directional;
         public Vector2I origin = origin;
         public List<Vector2I> points = points;
@@ -201,6 +202,7 @@ public partial class Parts : Node
         public Vector2I location = new(-1, -1);
         public int rotation = 0;
         public int tickCooldown = 0;
+        public List<int> linkingGroups = [];
         public List<Binding> bindings = [];
 
         public List<Vector2I> GetPoints()
@@ -237,7 +239,7 @@ public partial class Parts : Node
 
     public static readonly Dictionary<string, Action<Part, int, ArrayList>> tickActions = new(){
         {"GenericOnTick", delegate(Part self, int robotID, ArrayList args) {
-            int cooldown = 60;
+            int cooldown = 1;
 
             self.tickCooldown = cooldown;
         }},
@@ -250,6 +252,7 @@ public partial class Parts : Node
 
     public static readonly List<Part> partList = [
         new Part(   0, "Delete",
+                    -1,
                     false,
                     new(0, 0),
                     [new(0, 0)],
@@ -257,6 +260,7 @@ public partial class Parts : Node
                     [],
                     "GenericOnTick"),
         new Part(   1, "Bumper Corner",
+                    -1,
                     true,
                     new(0, 0),
                     [new(0, 0)],
@@ -264,6 +268,7 @@ public partial class Parts : Node
                     [],
                     "GenericOnTick"),
         new Part(   2, "Bumper Side",
+                    -1,
                     true,
                     new(0, 0),
                     [new(0, 0)],
@@ -271,6 +276,7 @@ public partial class Parts : Node
                     [],
                     "GenericOnTick"),
         new Part(   3, "Metal",
+                    -1,
                     false,
                     new(0, 0),
                     [new(0, 0)],
@@ -278,6 +284,7 @@ public partial class Parts : Node
                     [],
                     "GenericOnTick"),
         new Part(   4, "Swerve Module",
+                    1,
                     true,
                     new(1, 1),
                     [new(0, 0), new(1, 0), new(0, 1), new(1, 1), new(2, 1), new(1, 2), new(2, 2)],
