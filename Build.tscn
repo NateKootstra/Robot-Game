@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=4 uid="uid://bp2rvl8d3v3j0"]
+[gd_scene load_steps=18 format=4 uid="uid://bp2rvl8d3v3j0"]
 
 [ext_resource type="Texture2D" uid="uid://d0w4ckosrqxv0" path="res://sprites/Robot Game/Base/Corner.png" id="1_m507v"]
 [ext_resource type="Texture2D" uid="uid://bdtp4l88w81jl" path="res://sprites/Robot Game/Base/Side.png" id="2_dne6j"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://drwu60qp8ys54" path="res://sprites/Robot Game/Modules/Swerve Module.png" id="4_j2eep"]
 [ext_resource type="Texture2D" uid="uid://docud6stecado" path="res://sprites/PartsBG.png" id="6_4076e"]
 [ext_resource type="Texture2D" uid="uid://erjtkc31e8cw" path="res://sprites/BlackSquare.png" id="8_8uch7"]
+[ext_resource type="Texture2D" uid="uid://dbl7sok6ej5u7" path="res://sprites/Selected.png" id="9_eluow"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_j2eep"]
 texture = ExtResource("6_4076e")
@@ -142,8 +143,305 @@ theme_override_font_sizes/normal_font_size = 60
 bbcode_enabled = true
 text = "[right](0, 0)"
 
-[node name="BindingPreset" type="Node2D" parent="ConfigurePart"]
+[node name="LinkingGroups" type="Node2D" parent="ConfigurePart"]
 visible = false
+position = Vector2(46, 120)
+
+[node name="1" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_right = 64.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/1"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/1"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]1"
+
+[node name="2" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 64.0
+offset_right = 128.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/2"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/2"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]2"
+
+[node name="3" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 128.0
+offset_right = 192.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/3"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/3"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]3"
+
+[node name="4" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 192.0
+offset_right = 256.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/4"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/4"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]4"
+
+[node name="5" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 256.0
+offset_right = 320.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/5"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/5"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]5"
+
+[node name="6" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 320.0
+offset_right = 384.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/6"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/6"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]6"
+
+[node name="7" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 384.0
+offset_right = 448.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/7"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/7"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]7"
+
+[node name="8" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 448.0
+offset_right = 512.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/8"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/8"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]8"
+
+[node name="9" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 512.0
+offset_right = 576.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/9"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/9"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]9"
+
+[node name="10" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 576.0
+offset_right = 640.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/10"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/10"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]10"
+
+[node name="11" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 640.0
+offset_right = 704.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/11"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/11"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]11"
+
+[node name="12" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 704.0
+offset_right = 768.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/12"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/12"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]12
+"
+
+[node name="13" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 768.0
+offset_right = 832.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/13"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/13"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]13"
+
+[node name="14" type="Button" parent="ConfigurePart/LinkingGroups"]
+offset_left = 832.0
+offset_right = 896.0
+offset_bottom = 64.0
+focus_mode = 0
+
+[node name="BG" type="Sprite2D" parent="ConfigurePart/LinkingGroups/14"]
+scale = Vector2(4, 4)
+texture = ExtResource("9_eluow")
+centered = false
+hframes = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="ConfigurePart/LinkingGroups/14"]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+text = "[center]14"
+
+[node name="BindingPreset" type="Node2D" parent="ConfigurePart"]
 position = Vector2(0, 400)
 
 [node name="ConditionalToggle" type="CheckButton" parent="ConfigurePart/BindingPreset"]

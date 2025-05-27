@@ -16,6 +16,9 @@ public partial class RobotBuilder : Node2D
     private string selectedBot = "";
     private Parts.Part viewedPart;
 
+    Node2D configurePart;
+    Node2D linkingGroups;
+
     public List<Parts.Part> robot = [];
 
 
@@ -31,10 +34,24 @@ public partial class RobotBuilder : Node2D
         }
     }
 
+    public void UpdateLinkingGroup(int index)
+    {
+        GD.Print(index);
+        if (!viewedPart.linkingGroups.Remove(index))
+            viewedPart.linkingGroups.Add(index);
+        linkingGroups.GetChild<Button>(index).GetChild<Sprite2D>(0).Frame = viewedPart.linkingGroups.Contains(index) ? 1 : 0;
+    }
+
     public override void _Ready()
     {
-        String[] robots = DirAccess.GetFilesAt("user://robots");
+        configurePart = GetParent().GetChild<Node2D>(3);
+        linkingGroups = GetParent().GetChild<Node2D>(3).GetChild<Node2D>(3);
 
+        for (int i = 0; i < linkingGroups.GetChildren().Count; i++)
+        {
+            int index = i;
+            linkingGroups.GetChild<Button>(i).Pressed += () => UpdateLinkingGroup(index);
+        }
 
         // if (!robots.Contains(selectedBot + ".robot"))
         //     selectedBot = robots[0]
@@ -43,20 +60,17 @@ public partial class RobotBuilder : Node2D
         robotMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(0);
         previewMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(1);
 
-        if (robots.Length == 0)
-        {
-            var robotCells = robotMap.GetUsedCells();
-            for (int i = 0; i < robotCells.Count; i++)
-                if (Math.Abs(robotCells[i].X) < 10 && Math.Abs(robotCells[i].Y) < 10 && !(robotMap.GetCellSourceId(robotCells[i]) == -1))
+        var robotCells = robotMap.GetUsedCells();
+        for (int i = 0; i < robotCells.Count; i++)
+            if (Math.Abs(robotCells[i].X) < 10 && Math.Abs(robotCells[i].Y) < 10 && !(robotMap.GetCellSourceId(robotCells[i]) == -1))
+            {
+                if (robotMap.GetCellAtlasCoords(robotCells[i]) == Parts.partList[robotMap.GetCellSourceId(robotCells[i])].origin)
                 {
-                    if (robotMap.GetCellAtlasCoords(robotCells[i]) == Parts.partList[robotMap.GetCellSourceId(robotCells[i])].origin)
-                    {
-                        robot.Add(Parts.partList[robotMap.GetCellSourceId(robotCells[i])].Copy());
-                        robot[^1].location = robotCells[i];
-                        robot[^1].rotation = Parts.rotations.IndexOf(robotMap.GetCellAlternativeTile(robotCells[i]));
-                    }
+                    robot.Add(Parts.partList[robotMap.GetCellSourceId(robotCells[i])].Copy());
+                    robot[^1].location = robotCells[i];
+                    robot[^1].rotation = Parts.rotations.IndexOf(robotMap.GetCellAlternativeTile(robotCells[i]));
                 }
-        }
+            }
         UpdateRobot();
     }
 
@@ -128,19 +142,23 @@ public partial class RobotBuilder : Node2D
                             if (marked)
                                 viewedPart = robot[i];
                         }
-                        GetParent().GetChild<Node2D>(3).GetChild<RichTextLabel>(1).Text = viewedPart.name;
-                        GetParent().GetChild<Node2D>(3).GetChild<RichTextLabel>(2).Text = "[right]" + (viewedPart.location + new Vector2I(8, 8)).ToString();
-                        GetParent().GetChild<Node2D>(3).Show();
+                        configurePart.GetChild<RichTextLabel>(1).Text = viewedPart.name;
+                        configurePart.GetChild<RichTextLabel>(2).Text = "[right]" + (viewedPart.location + new Vector2I(8, 8)).ToString();
+                        for (int i = 0; i < linkingGroups.GetChildren().Count; i++)
+                        {
+                            linkingGroups.GetChild<Button>(i).GetChild<Sprite2D>(0).Frame = viewedPart.linkingGroups.Contains(i) ? 1 : 0;
+                        }
+                        configurePart.Show();
                     }
                 }
                 else if (selectedPart == -1)
                 {
-                    GetParent().GetChild<Node2D>(3).Hide();
+                    configurePart.Hide();
                 }
             }
             else if (robotLocation.X >= -9 && robotLocation.Y >= -9 && robotLocation.X <= 8 && robotLocation.Y <= 8)
-                GetParent().GetChild<Node2D>(3).Hide();
-            else if ((robotLocation.X < -9 || robotLocation.Y < -9 || robotLocation.X > 8 || robotLocation.Y > 8) && !GetParent().GetChild<Node2D>(3).Visible)
+                configurePart.Hide();
+            else if ((robotLocation.X < -9 || robotLocation.Y < -9 || robotLocation.X > 8 || robotLocation.Y > 8) && !configurePart.Visible)
             {
                 selectedPart = partsMap.GetCellSourceId(partsMap.LocalToMap(partsMap.ToLocal(GetGlobalMousePosition())));
                 if (selectedPart > 0)

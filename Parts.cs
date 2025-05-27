@@ -202,8 +202,8 @@ public partial class Parts : Node
         public Vector2I location = new(-1, -1);
         public int rotation = 0;
         public int tickCooldown = 0;
-        public List<int> linkingGroups = [];
-        public List<Binding> bindings = [];
+        public List<int> linkingGroups;
+        public List<Binding> bindings;
 
         public List<Vector2I> GetPoints()
         {
@@ -233,7 +233,10 @@ public partial class Parts : Node
         }
         public Part Copy()
         {
-            return (Part)MemberwiseClone();
+            Part clone = (Part)MemberwiseClone();
+            clone.linkingGroups = [];
+            clone.bindings = [];
+            return clone;
         }
     }
 

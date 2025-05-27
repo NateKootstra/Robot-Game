@@ -14,7 +14,6 @@ public partial class Menu : Node2D
             string scene = GetChild<Button>(i).Name;
             GetChild<Button>(i).ButtonUp += () => ChangeScene(scene);
         }
-
     }
 
     public void ChangeScene(string scene)
