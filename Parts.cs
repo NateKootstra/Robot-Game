@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 [GlobalClass]
 public partial class Parts : Node
@@ -25,10 +26,17 @@ public partial class Parts : Node
     // Memory AND = Key    R -> Trigger Direction =  Number 360
     public class Binding()
     {
-        public bool comparison = true;
+        public static readonly List<string> typeOptions = [
+            "Memory",
+            "Trigger",
+            "Number",
+            "Key"
+        ];
+
+        public bool comparison = false;
         public List<int> types = [2, 2, 0, 2];
-        public List<string> inputs = ["0", "0", "", "0"];
-        public List<string> operands = ["=", "="];
+        public List<string> inputs = ["", "", "", ""];
+        public List<string> operands = ["==", "="];
 
         public void RunBinding(int robotIndex, int partIndex)
         {
@@ -44,7 +52,7 @@ public partial class Parts : Node
                                 values.Add(Robots.list[robotIndex].memory[inputs[i]]);
                                 break;
                             case 1:
-                                values.Add(Robots.list[robotIndex].parts[partIndex].triggers[inputs[i]].value);
+                                values.Add(Robots.list[robotIndex].parts[partIndex].triggers[inputs[i]][2]);
                                 break;
                             case 2:
                                 values.Add(double.Parse(inputs[i], System.Globalization.CultureInfo.InvariantCulture));
@@ -62,7 +70,7 @@ public partial class Parts : Node
                     bool comparisonResult = false;
                     switch (operands[0])
                     {
-                        case "=":
+                        case "==":
                             comparisonResult = values[0] == values[1];
                             break;
                         case ">":
@@ -93,10 +101,8 @@ public partial class Parts : Node
                         }
                         else
                         {
-                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
-                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] = values[2];
-                            else
-                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], values[2]);
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.TryGetValue(inputs[2], out List<double> value))
+                                value[2] = values[2];
                         }
                         break;
                     case "+=":
@@ -109,10 +115,8 @@ public partial class Parts : Node
                         }
                         else
                         {
-                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
-                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] += values[2];
-                            else
-                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], values[2]);
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.TryGetValue(inputs[2], out List<double> value))
+                                value[2] += values[2];
                         }
                         break;
                     case "-=":
@@ -125,10 +129,8 @@ public partial class Parts : Node
                         }
                         else
                         {
-                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
-                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] -= values[2];
-                            else
-                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], -values[2]);
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.TryGetValue(inputs[2], out List<double> value))
+                                value[2] -= values[2];
                         }
                         break;
                     case "*=":
@@ -141,10 +143,8 @@ public partial class Parts : Node
                         }
                         else
                         {
-                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
-                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] *= values[2];
-                            else
-                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], 0);
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.TryGetValue(inputs[2], out List<double> value))
+                                value[2] *= values[2];
                         }
                         break;
                     case "/=":
@@ -157,10 +157,8 @@ public partial class Parts : Node
                         }
                         else
                         {
-                            if (Robots.list[robotIndex].parts[partIndex].triggers.ContainsKey(inputs[2]))
-                                Robots.list[robotIndex].parts[partIndex].triggers[inputs[2]] /= values[2];
-                            else
-                                Robots.list[robotIndex].parts[partIndex].triggers.Add(inputs[2], 0);
+                            if (Robots.list[robotIndex].parts[partIndex].triggers.TryGetValue(inputs[2], out List<double> value))
+                                value[2] /= values[2];
                         }
                         break;
                 }
@@ -171,23 +169,7 @@ public partial class Parts : Node
             }
         }
     }
-    public class BooleanTrigger(bool value)
-    {
-        public bool value = value;
-    }
-    public class IntegerTrigger(int min, int max, int value)
-    {
-        public int min = min;
-        public int max = max;
-        public int value = value;
-    }
-    public class DoubleTrigger(double min, double max, double value)
-    {
-        public double min = min;
-        public double max = max;
-        public double value = value;
-    }
-    public class Part(int id, string name, int priority, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, dynamic> triggers, string onTick)
+    public class Part(int id, string name, int priority, bool directional, Vector2I origin, List<Vector2I> points, double weight, Dictionary<string, List<double>> triggers, string onTick)
     {
         public int id = id;
         public string name = name;
@@ -196,15 +178,33 @@ public partial class Parts : Node
         public Vector2I origin = origin;
         public List<Vector2I> points = points;
         public double weight = weight;
-        public Dictionary<string, dynamic> triggers = triggers;
+        public Dictionary<string, List<double>> triggers = triggers;
         public string onTick = onTick;
 
         public Vector2I location = new(-1, -1);
         public int rotation = 0;
-        public int tickCooldown = 0;
         public List<int> linkingGroups;
         public List<Binding> bindings;
 
+        public int tickCooldown = 0;
+
+        public Part(string json) : this(
+            (int)Part.FromJSON(json)[0],
+            partList[(int)Part.FromJSON(json)[0]].name,
+            partList[(int)Part.FromJSON(json)[0]].priority,
+            partList[(int)Part.FromJSON(json)[0]].directional,
+            partList[(int)Part.FromJSON(json)[0]].origin,
+            partList[(int)Part.FromJSON(json)[0]].points,
+            partList[(int)Part.FromJSON(json)[0]].weight,
+            partList[(int)Part.FromJSON(json)[0]].triggers,
+            partList[(int)Part.FromJSON(json)[0]].onTick
+            )
+        {
+            location = (Vector2I)Part.FromJSON(json)[1];
+            rotation = (int)Part.FromJSON(json)[2];
+            linkingGroups = (List<int>)Part.FromJSON(json)[3];
+            bindings = (List<Binding>)Part.FromJSON(json)[4];
+        }
         public List<Vector2I> GetPoints()
         {
             Vector2I max = new(0, 0);
@@ -238,7 +238,52 @@ public partial class Parts : Node
             clone.bindings = [];
             return clone;
         }
+
+        public Dictionary<string, dynamic> GetJSON()
+        {
+            List<Dictionary<string, dynamic>> preparedBindings = [];
+            foreach (Binding binding in bindings)
+            {
+                preparedBindings.Add(new()
+                {
+                    { "comparison", binding.comparison },
+                    { "types", binding.types },
+                    { "inputs", binding.inputs },
+                    { "operands", binding.operands }
+                });
+            }
+
+            return new(){
+                { "id", id },
+                { "location", new List<int>(){location.X, location.Y} },
+                { "rotation", rotation },
+                { "linkingGroups", linkingGroups },
+                { "bindings", preparedBindings }
+            };
+        }
+
+        private static ArrayList FromJSON(string json)
+        {
+            ArrayList newPart = [];
+            var data = Json.ParseString(json);
+            newPart.Add((int)data.AsGodotDictionary()["id"]);
+            newPart.Add(new Vector2I(data.AsGodotDictionary()["location"].AsInt32Array()[0], data.AsGodotDictionary()["location"].AsInt32Array()[1]));
+            newPart.Add((int)data.AsGodotDictionary()["rotation"]);
+            newPart.Add(data.AsGodotDictionary()["linkingGroups"].AsInt32Array().ToList());
+            List<Binding> bindings = [];
+            foreach (var bindingDict in data.AsGodotDictionary()["bindings"].AsGodotArray())
+            {
+                bindings.Add(new());
+                bindings[^1].comparison = (Boolean)bindingDict.AsGodotDictionary()["comparison"];
+                bindings[^1].types = [.. bindingDict.AsGodotDictionary()["types"].AsInt32Array()];
+                bindings[^1].inputs = [.. bindingDict.AsGodotDictionary()["inputs"].AsStringArray()];
+                bindings[^1].operands = [.. bindingDict.AsGodotDictionary()["operands"].AsStringArray()];
+            }
+            newPart.Add(bindings);
+            return newPart;
+        }
     }
+
 
     public static readonly Dictionary<string, Action<Part, int, ArrayList>> tickActions = new(){
         {"GenericOnTick", delegate(Part self, int robotID, ArrayList args) {
@@ -287,12 +332,12 @@ public partial class Parts : Node
                     [],
                     "GenericOnTick"),
         new Part(   4, "Swerve Module",
-                    1,
+                    2,
                     true,
                     new(1, 1),
                     [new(0, 0), new(1, 0), new(0, 1), new(1, 1), new(2, 1), new(1, 2), new(2, 2)],
                     1,
-                    new(){{ "Speed", new DoubleTrigger(-1, 1, 0) }, { "Dir", new DoubleTrigger(0, 360, 0) }},
-                    "GenericOnTick"),
+                    new(){{ "Speed", [-1, 1, 0] }, { "Dir", [0, 360, 0]}},
+                    "SwerveModuleOnTick"),
     ];
 }

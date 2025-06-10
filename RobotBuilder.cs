@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 public partial class RobotBuilder : Node2D
 {
@@ -13,11 +14,17 @@ public partial class RobotBuilder : Node2D
 
     private int selectedPart = -1;
     private int rotation = 0;
-    private string selectedBot = "";
+    private string selectedRobot = "";
     private Parts.Part viewedPart;
+    private bool canLoadBindings = true;
+
+    Node2D UI;
+    OptionButton robotDropdown;
 
     Node2D configurePart;
     Node2D linkingGroups;
+    ScrollContainer bindings;
+
 
     public List<Parts.Part> robot = [];
 
@@ -36,16 +43,287 @@ public partial class RobotBuilder : Node2D
 
     public void UpdateLinkingGroup(int index)
     {
-        GD.Print(index);
         if (!viewedPart.linkingGroups.Remove(index))
             viewedPart.linkingGroups.Add(index);
         linkingGroups.GetChild<Button>(index).GetChild<Sprite2D>(0).Frame = viewedPart.linkingGroups.Contains(index) ? 1 : 0;
     }
 
+    public void LoadBindings()
+    {
+        if (bindings.GetChildren().Count > 1)
+            bindings.GetChild<VBoxContainer>(1).QueueFree();
+        VBoxContainer newBindings = (VBoxContainer)bindings.GetChild<VBoxContainer>(0).Duplicate();
+        newBindings.Show();
+        int i = 0;
+        foreach (Parts.Binding binding in viewedPart.bindings)
+        {
+            Node2D bindingNode = (Node2D)newBindings.GetChild<Node2D>(0).Duplicate();
+
+            bindingNode.Show();
+            bindingNode.Position += new Vector2(0, i * 150);
+            Button delete = bindingNode.GetChild<Button>(0);
+            CheckButton comparison = bindingNode.GetChild<CheckButton>(1);
+            Node2D conditional = bindingNode.GetChild<Node2D>(2);
+            Node2D statement = bindingNode.GetChild<Node2D>(3);
+            comparison.ButtonPressed = binding.comparison;
+            conditional.GetChild<Button>(0).Text = Parts.Binding.typeOptions[binding.types[0]];
+            conditional.GetChild<LineEdit>(1).Text = binding.inputs[0];
+            conditional.GetChild<Button>(2).Text = binding.operands[0];
+            conditional.GetChild<Button>(3).Text = Parts.Binding.typeOptions[binding.types[1]];
+            conditional.GetChild<LineEdit>(4).Text = binding.inputs[1];
+            if (!binding.comparison)
+                conditional.Hide();
+            statement.GetChild<Button>(0).Text = Parts.Binding.typeOptions[binding.types[2]];
+            statement.GetChild<LineEdit>(1).Text = binding.inputs[2];
+            statement.GetChild<Button>(2).Text = binding.operands[1];
+            statement.GetChild<Button>(3).Text = Parts.Binding.typeOptions[binding.types[3]];
+            statement.GetChild<LineEdit>(4).Text = binding.inputs[3];
+
+            int index = i;
+            delete.Pressed += () => RemoveBinding(index);
+            comparison.Pressed += () => ToggleConditional(index);
+            conditional.GetChild<Button>(0).Pressed += () => IncrementType(index, 0);
+            conditional.GetChild<Button>(2).Pressed += () => IncrementOperand1(index);
+            conditional.GetChild<Button>(3).Pressed += () => IncrementType(index, 1);
+            statement.GetChild<Button>(0).Pressed += () => IncrementType(index, 2);
+            statement.GetChild<Button>(2).Pressed += () => IncrementOperand2(index);
+            statement.GetChild<Button>(3).Pressed += () => IncrementType(index, 3);
+            conditional.GetChild<LineEdit>(1).FocusExited += () => SetInput(index, 0, conditional.GetChild<LineEdit>(1).Text);
+            conditional.GetChild<LineEdit>(4).FocusExited += () => SetInput(index, 1, conditional.GetChild<LineEdit>(4).Text);
+            statement.GetChild<LineEdit>(1).FocusExited += () => SetInput(index, 2, statement.GetChild<LineEdit>(1).Text);
+            statement.GetChild<LineEdit>(4).FocusExited += () => SetInput(index, 3, statement.GetChild<LineEdit>(4).Text);
+
+            newBindings.AddChild(bindingNode);
+
+            i++;
+        }
+        newBindings.GetChild<Node2D>(1).Position += new Vector2(0, i * 150);
+        newBindings.GetChild<Node2D>(1).GetChild<Button>(0).Pressed += AddBinding;
+        newBindings.CustomMinimumSize = new Vector2(1000, 150 + i * 150);
+        bindings.AddChild(newBindings);
+        canLoadBindings = true;
+    }
+
+    public void AddBinding()
+    {
+        viewedPart.bindings.Add(new Parts.Binding());
+        LoadBindings();
+    }
+
+    public void RemoveBinding(int index)
+    {
+        viewedPart.bindings.RemoveAt(index);
+        LoadBindings();
+    }
+
+    public void ToggleConditional(int index)
+    {
+        viewedPart.bindings[index].comparison = !viewedPart.bindings[index].comparison;
+        LoadBindings();
+    }
+
+    public void IncrementType(int index, int type)
+    {
+        viewedPart.bindings[index].types[type] += 1;
+        viewedPart.bindings[index].types[type] = viewedPart.bindings[index].types[type] > 3 ? 0 : viewedPart.bindings[index].types[type];
+        if (type == 2 && viewedPart.bindings[index].types[type] > 1)
+            viewedPart.bindings[index].types[type] = 0;
+        LoadBindings();
+    }
+
+    public void IncrementOperand1(int index)
+    {
+        if (viewedPart.bindings[index].operands[0] == "==")
+            viewedPart.bindings[index].operands[0] = ">";
+        else if (viewedPart.bindings[index].operands[0] == ">")
+            viewedPart.bindings[index].operands[0] = "<";
+        else if (viewedPart.bindings[index].operands[0] == "<")
+            viewedPart.bindings[index].operands[0] = ">=";
+        else if (viewedPart.bindings[index].operands[0] == ">=")
+            viewedPart.bindings[index].operands[0] = "<=";
+        else if (viewedPart.bindings[index].operands[0] == "<=")
+            viewedPart.bindings[index].operands[0] = "==";
+        LoadBindings();
+    }
+
+    public void IncrementOperand2(int index)
+    {
+        if (viewedPart.bindings[index].operands[1] == "=")
+            viewedPart.bindings[index].operands[1] = "+=";
+        else if (viewedPart.bindings[index].operands[1] == "+=")
+            viewedPart.bindings[index].operands[1] = "-=";
+        else if (viewedPart.bindings[index].operands[1] == "-=")
+            viewedPart.bindings[index].operands[1] = "*=";
+        else if (viewedPart.bindings[index].operands[1] == "*=")
+            viewedPart.bindings[index].operands[1] = "/=";
+        else if (viewedPart.bindings[index].operands[1] == "/=")
+            viewedPart.bindings[index].operands[1] = "=";
+        LoadBindings();
+    }
+
+    public void SetInput(int index, int input, string value)
+    {
+        if (canLoadBindings)
+        {
+            canLoadBindings = false;
+            viewedPart.bindings[index].inputs[input] = value;
+            LoadBindings();
+        }
+    }
+
+    public void Save()
+    {
+        List<Dictionary<string, dynamic>> data = [];
+        foreach (Parts.Part part in robot)
+        {
+            data.Add(part.GetJSON());
+        }
+        Godot.FileAccess bot = Godot.FileAccess.Open("user://robots/" + robotDropdown.Text + ".robot", Godot.FileAccess.ModeFlags.Write);
+        bot.StoreLine(JsonSerializer.Serialize(data));
+        bot.Close();
+    }
+
+    public void Load()
+    {
+        Godot.FileAccess botRead = Godot.FileAccess.Open("user://robots/" + robotDropdown.Text + ".robot", Godot.FileAccess.ModeFlags.Read);
+        string text = botRead.GetAsText().TrimPrefix("[").TrimSuffix("\n").TrimSuffix("]");
+        botRead.Close();
+        string[] partList = text.Split("},{");
+        for (int i = 0; i < partList.Length; i++)
+        {
+            if (!partList[i].StartsWith('{'))
+                partList[i] = "{" + partList[i];
+            if (!partList[i].EndsWith('}'))
+                partList[i] = partList[i] + "}";
+        }
+        robot = [];
+        foreach (string partString in partList)
+        {
+            robot.Add(new Parts.Part(partString));
+        }
+        configurePart.Hide();
+        UpdateRobot();
+    }
+
+    public void Rename()
+    {
+        if (!(UI.GetChild<LineEdit>(1).Text == "New Robot"))
+            DirAccess.Open("user://robots").Rename(robotDropdown.Text + ".robot", UI.GetChild<LineEdit>(1).Text + ".robot");
+        Godot.FileAccess userData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
+        string[] userDataArray = userData.GetAsText().Split(",\n");
+        for (int i = 0; i < userDataArray.Length; i++)
+        {
+            if (userDataArray[i].StartsWith("selectedRobot"))
+                userDataArray[i] = "selectedRobot=" + UI.GetChild<LineEdit>(1).Text;
+        }
+        userData.Close();
+        Godot.FileAccess userDataWrite = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Write);
+        userDataWrite.StoreLine(userDataArray.Join(",\n"));
+        userDataWrite.Close();
+        LoadSelectedRobot();
+    }
+
+    public void Delete()
+    {
+        DirAccess.Open("user://robots").Remove(robotDropdown.Text + ".robot");
+        Godot.FileAccess userData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
+        string[] userDataArray = userData.GetAsText().Split(",\n");
+        List<string> userDataList = [];
+        for (int i = 0; i < userDataArray.Length; i++)
+        {
+            if (!userDataArray[i].StartsWith("selectedRobot"))
+                userDataList.Add(userDataArray[i]);
+        }
+        userData.Close();
+        Godot.FileAccess userDataWrite = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Write);
+        userDataWrite.StoreLine(userDataList.ToArray().Join(",\n"));
+        userDataWrite.Close();
+        LoadSelectedRobot();
+    }
+
+    public void Select()
+    {
+        if (robotDropdown.Text == "New Robot")
+        {
+            int number = 1;
+            bool run = true;
+            while (run)
+            {
+                run = false;
+                for (int i = 0; i < robotDropdown.ItemCount; i++)
+                    if (robotDropdown.GetItemText(i) == ("Untitled " + number.ToString()))
+                        run = true;
+                if (run)
+                    number += 1;
+            }
+            robotDropdown.AddItem("Untitled " + number.ToString());
+            robotDropdown.Select(robotDropdown.ItemCount - 1);
+            Save();
+            Godot.FileAccess userData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
+            string[] userDataArray = userData.GetAsText().Split(",\n");
+            for (int i = 0; i < userDataArray.Length; i++)
+            {
+                if (userDataArray[i].StartsWith("selectedRobot"))
+                    userDataArray[i] = "selectedRobot=" + "Untitled " + number.ToString();
+            }
+            userData.Close();
+            Godot.FileAccess userDataWrite = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Write);
+            userDataWrite.StoreLine(userDataArray.Join(",\n"));
+            userDataWrite.Close();
+            LoadSelectedRobot();
+        }
+    }
+
+    public void LoadSelectedRobot()
+    {
+        DirAccess userFolder = DirAccess.Open("user://");
+        if (!userFolder.GetFiles().Contains("user.dat"))
+        {
+            DirAccess.CopyAbsolute("res://Kitbot.robot", "user://robots/Kitbot.robot");
+            Godot.FileAccess userData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Write);
+            userData.StoreLine("selectedRobot=Kitbot");
+            userData.Close();
+        }
+        DirAccess robotFolder = DirAccess.Open("user://robots");
+        robotDropdown.Clear();
+        foreach (string file in robotFolder.GetFiles())
+            robotDropdown.AddItem(file.TrimSuffix(".robot"));
+        robotDropdown.AddItem("New Robot");
+
+        Godot.FileAccess userDataRead = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
+        if (!userDataRead.GetAsText().Contains("selectedRobot"))
+        {
+            Godot.FileAccess userData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Write);
+            userData.StoreLine("selectedRobot=" + robotDropdown.Text);
+            userData.Close();
+        }
+        userDataRead.Close();
+        Godot.FileAccess confirmedUserData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
+        string[] points = confirmedUserData.GetAsText().Split(",\n");
+        foreach (string point in points)
+            if (point.Split("=")[0] == "selectedRobot")
+                selectedRobot = point.Split("=")[1].Trim();
+        confirmedUserData.Close();
+        GD.Print("Robot: " + selectedRobot);
+        for (int i = 0; i < robotDropdown.ItemCount; i++)
+            if (robotDropdown.GetItemText(i) == selectedRobot)
+                robotDropdown.Select(i);
+
+        Load();
+    }
+
     public override void _Ready()
     {
+        partsMap = this.GetChild<TileMapLayer>(0);
+        robotMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(0);
+        previewMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(1);
+
         configurePart = GetParent().GetChild<Node2D>(3);
-        linkingGroups = GetParent().GetChild<Node2D>(3).GetChild<Node2D>(3);
+        linkingGroups = configurePart.GetChild<Node2D>(3);
+        bindings = configurePart.GetChild<ScrollContainer>(4);
+
+        UI = GetParent().GetChild<Node2D>(4);
+        robotDropdown = UI.GetChild<OptionButton>(0);
 
         for (int i = 0; i < linkingGroups.GetChildren().Count; i++)
         {
@@ -53,25 +331,17 @@ public partial class RobotBuilder : Node2D
             linkingGroups.GetChild<Button>(i).Pressed += () => UpdateLinkingGroup(index);
         }
 
-        // if (!robots.Contains(selectedBot + ".robot"))
-        //     selectedBot = robots[0]
+        DirAccess userFolder = DirAccess.Open("user://");
+        if (!userFolder.DirExists("robots"))
+            userFolder.MakeDir("robots");
 
-        partsMap = this.GetChild<TileMapLayer>(0);
-        robotMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(0);
-        previewMap = this.GetParent().GetChild(2).GetChild<TileMapLayer>(1);
+        LoadSelectedRobot();
 
-        var robotCells = robotMap.GetUsedCells();
-        for (int i = 0; i < robotCells.Count; i++)
-            if (Math.Abs(robotCells[i].X) < 10 && Math.Abs(robotCells[i].Y) < 10 && !(robotMap.GetCellSourceId(robotCells[i]) == -1))
-            {
-                if (robotMap.GetCellAtlasCoords(robotCells[i]) == Parts.partList[robotMap.GetCellSourceId(robotCells[i])].origin)
-                {
-                    robot.Add(Parts.partList[robotMap.GetCellSourceId(robotCells[i])].Copy());
-                    robot[^1].location = robotCells[i];
-                    robot[^1].rotation = Parts.rotations.IndexOf(robotMap.GetCellAlternativeTile(robotCells[i]));
-                }
-            }
-        UpdateRobot();
+        robotDropdown.ItemSelected += (long index) => Select();
+        UI.GetChild<Button>(2).Pressed += () => Save();
+        UI.GetChild<Button>(3).Pressed += () => Load();
+        UI.GetChild<Button>(4).Pressed += () => Rename();
+        UI.GetChild<Button>(5).Pressed += () => Delete();
     }
 
     public override void _Process(double delta)
@@ -148,6 +418,7 @@ public partial class RobotBuilder : Node2D
                         {
                             linkingGroups.GetChild<Button>(i).GetChild<Sprite2D>(0).Frame = viewedPart.linkingGroups.Contains(i) ? 1 : 0;
                         }
+                        LoadBindings();
                         configurePart.Show();
                     }
                 }
