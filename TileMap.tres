@@ -1,0 +1,42 @@
+[gd_resource type="TileSet" load_steps=11 format=3 uid="uid://bs6ankc5ai6fa"]
+
+[ext_resource type="Texture2D" uid="uid://cjg0j75n8a61t" path="res://sprites/Robot Game/Base/Delete.png" id="1_i15sh"]
+[ext_resource type="Texture2D" uid="uid://d0w4ckosrqxv0" path="res://sprites/Robot Game/Base/Corner.png" id="2_qxrak"]
+[ext_resource type="Texture2D" uid="uid://bdtp4l88w81jl" path="res://sprites/Robot Game/Base/Side.png" id="3_cmttp"]
+[ext_resource type="Texture2D" uid="uid://clta2xqmssfp4" path="res://sprites/Robot Game/Base/Metal.png" id="4_ex2wg"]
+[ext_resource type="Texture2D" uid="uid://drwu60qp8ys54" path="res://sprites/Robot Game/Modules/Swerve Module.png" id="5_7pu33"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_51fak"]
+texture = ExtResource("1_i15sh")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8uch7"]
+resource_name = "Bumper Corner"
+texture = ExtResource("2_qxrak")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_eluow"]
+resource_name = "Bumper Side"
+texture = ExtResource("3_cmttp")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_yw58n"]
+texture = ExtResource("4_ex2wg")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xpaca"]
+texture = ExtResource("5_7pu33")
+0:0/0 = 0
+1:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+
+[resource]
+sources/4 = SubResource("TileSetAtlasSource_xpaca")
+sources/3 = SubResource("TileSetAtlasSource_yw58n")
+sources/2 = SubResource("TileSetAtlasSource_eluow")
+sources/1 = SubResource("TileSetAtlasSource_8uch7")
+sources/0 = SubResource("TileSetAtlasSource_51fak")

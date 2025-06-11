@@ -188,11 +188,11 @@ public partial class RobotBuilder : Node2D
         Godot.FileAccess botRead = Godot.FileAccess.Open("user://robots/" + robotDropdown.Text + ".robot", Godot.FileAccess.ModeFlags.Read);
         string text = botRead.GetAsText().TrimPrefix("[").TrimSuffix("\n").TrimSuffix("]");
         botRead.Close();
-        string[] partList = text.Split("},{");
+        string[] partList = text.Split("},{\"id");
         for (int i = 0; i < partList.Length; i++)
         {
             if (!partList[i].StartsWith('{'))
-                partList[i] = "{" + partList[i];
+                partList[i] = "{\"id" + partList[i];
             if (!partList[i].EndsWith('}'))
                 partList[i] = partList[i] + "}";
         }
@@ -304,7 +304,6 @@ public partial class RobotBuilder : Node2D
             if (point.Split("=")[0] == "selectedRobot")
                 selectedRobot = point.Split("=")[1].Trim();
         confirmedUserData.Close();
-        GD.Print("Robot: " + selectedRobot);
         for (int i = 0; i < robotDropdown.ItemCount; i++)
             if (robotDropdown.GetItemText(i) == selectedRobot)
                 robotDropdown.Select(i);

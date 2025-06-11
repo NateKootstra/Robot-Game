@@ -1,11 +1,8 @@
-[gd_scene load_steps=19 format=4 uid="uid://bp2rvl8d3v3j0"]
+[gd_scene load_steps=10 format=4 uid="uid://bp2rvl8d3v3j0"]
 
-[ext_resource type="Texture2D" uid="uid://d0w4ckosrqxv0" path="res://sprites/Robot Game/Base/Corner.png" id="1_m507v"]
-[ext_resource type="Texture2D" uid="uid://bdtp4l88w81jl" path="res://sprites/Robot Game/Base/Side.png" id="2_dne6j"]
+[ext_resource type="Script" uid="uid://c22kj8c75oi7g" path="res://Exit.cs" id="1_4076e"]
 [ext_resource type="Script" uid="uid://bbwup3ilkfiu4" path="res://RobotBuilder.cs" id="2_j2eep"]
-[ext_resource type="Texture2D" uid="uid://clta2xqmssfp4" path="res://sprites/Robot Game/Base/Metal.png" id="3_4076e"]
-[ext_resource type="Texture2D" uid="uid://cjg0j75n8a61t" path="res://sprites/Robot Game/Base/Delete.png" id="3_j2eep"]
-[ext_resource type="Texture2D" uid="uid://drwu60qp8ys54" path="res://sprites/Robot Game/Modules/Swerve Module.png" id="4_j2eep"]
+[ext_resource type="TileSet" uid="uid://bs6ankc5ai6fa" path="res://TileMap.tres" id="3_dne6j"]
 [ext_resource type="Texture2D" uid="uid://docud6stecado" path="res://sprites/PartsBG.png" id="6_4076e"]
 [ext_resource type="Texture2D" uid="uid://erjtkc31e8cw" path="res://sprites/BlackSquare.png" id="8_8uch7"]
 [ext_resource type="Texture2D" uid="uid://dbl7sok6ej5u7" path="res://sprites/Selected.png" id="9_eluow"]
@@ -52,41 +49,6 @@ texture = ExtResource("6_4076e")
 [sub_resource type="TileSet" id="TileSet_8uch7"]
 sources/0 = SubResource("TileSetAtlasSource_j2eep")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_51fak"]
-texture = ExtResource("3_j2eep")
-0:0/0 = 0
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8uch7"]
-resource_name = "Bumper Corner"
-texture = ExtResource("1_m507v")
-0:0/0 = 0
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_eluow"]
-resource_name = "Bumper Side"
-texture = ExtResource("2_dne6j")
-0:0/0 = 0
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_yw58n"]
-texture = ExtResource("3_4076e")
-0:0/0 = 0
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xpaca"]
-texture = ExtResource("4_j2eep")
-0:0/0 = 0
-1:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
-2:1/0 = 0
-1:2/0 = 0
-2:2/0 = 0
-
-[sub_resource type="TileSet" id="TileSet_51fak"]
-sources/4 = SubResource("TileSetAtlasSource_xpaca")
-sources/3 = SubResource("TileSetAtlasSource_yw58n")
-sources/2 = SubResource("TileSetAtlasSource_eluow")
-sources/1 = SubResource("TileSetAtlasSource_8uch7")
-sources/0 = SubResource("TileSetAtlasSource_51fak")
-
 [sub_resource type="Environment" id="Environment_eluow"]
 background_mode = 3
 background_color = Color(0.838415, 0, 0.15122, 1)
@@ -109,6 +71,7 @@ adjustment_brightness = 1.05
 adjustment_saturation = 1.15
 
 [node name="Build" type="Node2D"]
+script = ExtResource("1_4076e")
 
 [node name="Background" type="TileMapLayer" parent="."]
 position = Vector2(840, 310)
@@ -123,7 +86,7 @@ script = ExtResource("2_j2eep")
 position = Vector2(840, 310)
 scale = Vector2(2.5, 2.5)
 tile_map_data = PackedByteArray("AAACAAIAAAAAAAAAAAACAAUAAwAAAAAAAAAFAAIABAAAAAAAAAAFAAMABAAAAAEAAAAGAAIABAABAAAAAAAGAAMABAABAAEAAAAGAAQABAABAAIAAAAHAAMABAACAAEAAAAHAAQABAACAAIAAAA=")
-tile_set = SubResource("TileSet_51fak")
+tile_set = ExtResource("3_dne6j")
 
 [node name="Robot" type="Node2D" parent="."]
 position = Vector2(400, 670)
@@ -131,11 +94,11 @@ position = Vector2(400, 670)
 [node name="Tiles" type="TileMapLayer" parent="Robot"]
 scale = Vector2(2.5, 2.5)
 tile_map_data = PackedByteArray("AAD3//f/AQAAAAAAAAD3//j/AgAAAAAAAAD3//n/AgAAAAAAAAD3//r/AgAAAAAAAAD3//v/AgAAAAAAAAD3//z/AgAAAAAAAAD3//3/AgAAAAAAAAD3////AgAAAAAAAAD3//7/AgAAAAAAAAD3/wAAAgAAAAAAAAD3/wEAAgAAAAAAAAD3/wIAAgAAAAAAAAD3/wMAAgAAAAAAAAD3/wQAAgAAAAAAAAD3/wUAAgAAAAAAAAD3/wYAAgAAAAAAAAD3/wcAAgAAAAAAAAD3/wgAAQAAAAAAAGD4/wgAAgAAAAAAAFD5/wgAAgAAAAAAAFD6/wgAAgAAAAAAAFD7/wgAAgAAAAAAAFD8/wgAAgAAAAAAAFD9/wgAAgAAAAAAAFD+/wgAAgAAAAAAAFD//wgAAgAAAAAAAFD4//f/AgAAAAAAAFD5//f/AgAAAAAAAFD6//f/AgAAAAAAAFD7//f/AgAAAAAAAFD8//f/AgAAAAAAAFD9//f/AgAAAAAAAFD+//f/AgAAAAAAAFD///f/AgAAAAAAAFAAAPf/AgAAAAAAAFABAPf/AgAAAAAAAFACAPf/AgAAAAAAAFADAPf/AgAAAAAAAFAEAPf/AgAAAAAAAFAFAPf/AgAAAAAAAFAGAPf/AgAAAAAAAFAHAPf/AgAAAAAAAFAAAAgAAgAAAAAAAFABAAgAAgAAAAAAAFACAAgAAgAAAAAAAFADAAgAAgAAAAAAAFAEAAgAAgAAAAAAAFAFAAgAAgAAAAAAAFAGAAgAAgAAAAAAAFAHAAgAAgAAAAAAAFAIAPf/AQAAAAAAAFAIAAgAAQAAAAAAADAIAAYAAgAAAAAAAAAIAAcAAgAAAAAAAAAIAPj/AgAAAAAAAAAIAPn/AgAAAAAAAAAIAPr/AgAAAAAAAAAIAPv/AgAAAAAAAAAIAPz/AgAAAAAAAAAIAP3/AgAAAAAAAAAIAP7/AgAAAAAAAAAIAP//AgAAAAAAAAAIAAAAAgAAAAAAAAAIAAEAAgAAAAAAAAAIAAIAAgAAAAAAAAAIAAMAAgAAAAAAAAAIAAQAAgAAAAAAAAAIAAUAAgAAAAAAAAD4//j/AwAAAAAAAAD4//r/AwAAAAAAAAD4//n/AwAAAAAAAAD4//v/AwAAAAAAAAD4//z/AwAAAAAAAAD4//3/AwAAAAAAAAD4//7/AwAAAAAAAAD4////AwAAAAAAAAD4/wAAAwAAAAAAAAD4/wEAAwAAAAAAAAD4/wIAAwAAAAAAAAD4/wMAAwAAAAAAAAD4/wQAAwAAAAAAAAD4/wUAAwAAAAAAAAD4/wYAAwAAAAAAAAD4/wcAAwAAAAAAAAD5/wcAAwAAAAAAAAD6/wcAAwAAAAAAAAD7/wcAAwAAAAAAAAD8/wcAAwAAAAAAAAD9/wcAAwAAAAAAAAD+/wcAAwAAAAAAAAD//wcAAwAAAAAAAAAAAAcAAwAAAAAAAAABAAcAAwAAAAAAAAACAAcAAwAAAAAAAAADAAcAAwAAAAAAAAAEAAcAAwAAAAAAAAAFAAcAAwAAAAAAAAAGAAcAAwAAAAAAAAAHAAcAAwAAAAAAAAAHAAYAAwAAAAAAAAAHAAUAAwAAAAAAAAAHAAQAAwAAAAAAAAAHAAMAAwAAAAAAAAAHAAIAAwAAAAAAAAAHAAEAAwAAAAAAAAAHAAAAAwAAAAAAAAAHAP//AwAAAAAAAAAHAP7/AwAAAAAAAAAHAP3/AwAAAAAAAAAHAPz/AwAAAAAAAAAHAPv/AwAAAAAAAAAHAPr/AwAAAAAAAAAHAPn/AwAAAAAAAAAHAPj/AwAAAAAAAAAGAPj/AwAAAAAAAAAFAPj/AwAAAAAAAAAEAPj/AwAAAAAAAAADAPj/AwAAAAAAAAACAPj/AwAAAAAAAAABAPj/AwAAAAAAAAAAAPj/AwAAAAAAAAD///j/AwAAAAAAAAD+//j/AwAAAAAAAAD9//j/AwAAAAAAAAD8//j/AwAAAAAAAAD7//j/AwAAAAAAAAD6//j/AwAAAAAAAAD5//j/AwAAAAAAAAA=")
-tile_set = SubResource("TileSet_51fak")
+tile_set = ExtResource("3_dne6j")
 
 [node name="Preview" type="TileMapLayer" parent="Robot"]
 scale = Vector2(2.5, 2.5)
-tile_set = SubResource("TileSet_51fak")
+tile_set = ExtResource("3_dne6j")
 
 [node name="ConfigurePart" type="Node2D" parent="."]
 visible = false
@@ -608,6 +571,7 @@ offset_right = 755.0
 offset_bottom = 270.0
 theme_override_font_sizes/font_size = 60
 placeholder_text = "Rename..."
+max_length = 14
 
 [node name="Save" type="Button" parent="UI"]
 offset_left = 760.0

@@ -1,40 +1,9 @@
-[gd_scene load_steps=13 format=4 uid="uid://vgpkliqphujq"]
+[gd_scene load_steps=6 format=3 uid="uid://vgpkliqphujq"]
 
 [ext_resource type="Texture2D" uid="uid://ek7y6a33em6j" path="res://sprites/Field.png" id="1_82stj"]
+[ext_resource type="Script" uid="uid://c22kj8c75oi7g" path="res://Exit.cs" id="1_t6jwj"]
 [ext_resource type="Script" uid="uid://tgluiooluo50" path="res://Arcade.cs" id="2_khq6o"]
-[ext_resource type="Texture2D" uid="uid://d0w4ckosrqxv0" path="res://sprites/Robot Game/Base/Corner.png" id="3_qo8q5"]
-[ext_resource type="Texture2D" uid="uid://bdtp4l88w81jl" path="res://sprites/Robot Game/Base/Side.png" id="4_gna1g"]
-[ext_resource type="Texture2D" uid="uid://clta2xqmssfp4" path="res://sprites/Robot Game/Base/Metal.png" id="5_v4nrk"]
-[ext_resource type="Texture2D" uid="uid://drwu60qp8ys54" path="res://sprites/Robot Game/Modules/Swerve Module.png" id="6_my7yy"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ivycn"]
-resource_name = "Bumper"
-texture = ExtResource("3_qo8q5")
-0:0/0 = 0
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q1uvj"]
-texture = ExtResource("4_gna1g")
-0:0/0 = 0
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qs82m"]
-texture = ExtResource("5_v4nrk")
-0:0/0 = 0
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_c4vo5"]
-texture = ExtResource("6_my7yy")
-0:0/0 = 0
-1:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
-2:1/0 = 0
-1:2/0 = 0
-2:2/0 = 0
-
-[sub_resource type="TileSet" id="TileSet_vwb7u"]
-sources/0 = SubResource("TileSetAtlasSource_ivycn")
-sources/1 = SubResource("TileSetAtlasSource_q1uvj")
-sources/2 = SubResource("TileSetAtlasSource_qs82m")
-sources/3 = SubResource("TileSetAtlasSource_c4vo5")
+[ext_resource type="TileSet" uid="uid://bs6ankc5ai6fa" path="res://TileMap.tres" id="3_ilclh"]
 
 [sub_resource type="Environment" id="Environment_82stj"]
 background_mode = 3
@@ -58,6 +27,7 @@ adjustment_brightness = 1.05
 adjustment_saturation = 1.15
 
 [node name="Test" type="Node2D"]
+script = ExtResource("1_t6jwj")
 
 [node name="Field" type="Node2D" parent="."]
 
@@ -73,8 +43,7 @@ script = ExtResource("2_khq6o")
 
 [node name="Tiles" type="TileMapLayer" parent="Robot"]
 scale = Vector2(0.4, 0.4)
-tile_map_data = PackedByteArray("AAD3//f/AAAAAAAAAAD3//j/AQAAAAAAAAD3//n/AQAAAAAAAAD3//r/AQAAAAAAAAD3//v/AQAAAAAAAAD3//z/AQAAAAAAAAD3//3/AQAAAAAAAAD3////AQAAAAAAAAD3//7/AQAAAAAAAAD3/wAAAQAAAAAAAAD3/wEAAQAAAAAAAAD3/wIAAQAAAAAAAAD3/wMAAQAAAAAAAAD3/wQAAQAAAAAAAAD3/wUAAQAAAAAAAAD3/wYAAQAAAAAAAAD3/wcAAQAAAAAAAAD3/wgAAAAAAAAAAGD4/wgAAQAAAAAAAFD5/wgAAQAAAAAAAFD6/wgAAQAAAAAAAFD7/wgAAQAAAAAAAFD8/wgAAQAAAAAAAFD9/wgAAQAAAAAAAFD+/wgAAQAAAAAAAFD//wgAAQAAAAAAAFD4//f/AQAAAAAAAFD5//f/AQAAAAAAAFD6//f/AQAAAAAAAFD7//f/AQAAAAAAAFD8//f/AQAAAAAAAFD9//f/AQAAAAAAAFD+//f/AQAAAAAAAFD///f/AQAAAAAAAFAAAPf/AQAAAAAAAFABAPf/AQAAAAAAAFACAPf/AQAAAAAAAFADAPf/AQAAAAAAAFAEAPf/AQAAAAAAAFAFAPf/AQAAAAAAAFAGAPf/AQAAAAAAAFAHAPf/AQAAAAAAAFAAAAgAAQAAAAAAAFABAAgAAQAAAAAAAFACAAgAAQAAAAAAAFADAAgAAQAAAAAAAFAEAAgAAQAAAAAAAFAFAAgAAQAAAAAAAFAGAAgAAQAAAAAAAFAHAAgAAQAAAAAAAFAIAPf/AAAAAAAAAFAIAAgAAAAAAAAAADAIAAYAAQAAAAAAAAAIAAcAAQAAAAAAAAAIAPj/AQAAAAAAAAAIAPn/AQAAAAAAAAAIAPr/AQAAAAAAAAAIAPv/AQAAAAAAAAAIAPz/AQAAAAAAAAAIAP3/AQAAAAAAAAAIAP7/AQAAAAAAAAAIAP//AQAAAAAAAAAIAAAAAQAAAAAAAAAIAAEAAQAAAAAAAAAIAAIAAQAAAAAAAAAIAAMAAQAAAAAAAAAIAAQAAQAAAAAAAAAIAAUAAQAAAAAAAAD4//j/AgAAAAAAAAD4//r/AgAAAAAAAAD4//n/AgAAAAAAAAD4//v/AgAAAAAAAAD4//z/AgAAAAAAAAD4//3/AgAAAAAAAAD4//7/AgAAAAAAAAD4////AgAAAAAAAAD4/wAAAgAAAAAAAAD4/wEAAgAAAAAAAAD4/wIAAgAAAAAAAAD4/wMAAgAAAAAAAAD4/wQAAgAAAAAAAAD4/wUAAgAAAAAAAAD4/wYAAgAAAAAAAAD4/wcAAgAAAAAAAAD5/wcAAgAAAAAAAAD6/wcAAgAAAAAAAAD7/wcAAgAAAAAAAAD8/wcAAgAAAAAAAAD9/wcAAgAAAAAAAAD+/wcAAgAAAAAAAAD//wcAAgAAAAAAAAAAAAcAAgAAAAAAAAABAAcAAgAAAAAAAAACAAcAAgAAAAAAAAADAAcAAgAAAAAAAAAEAAcAAgAAAAAAAAAFAAcAAgAAAAAAAAAGAAcAAgAAAAAAAAAHAAcAAgAAAAAAAAAHAAYAAgAAAAAAAAAHAAUAAgAAAAAAAAAHAAQAAgAAAAAAAAAHAAMAAgAAAAAAAAAHAAIAAgAAAAAAAAAHAAEAAgAAAAAAAAAHAAAAAgAAAAAAAAAHAP//AgAAAAAAAAAHAP7/AgAAAAAAAAAHAP3/AgAAAAAAAAAHAPz/AgAAAAAAAAAHAPv/AgAAAAAAAAAHAPr/AgAAAAAAAAAHAPn/AgAAAAAAAAAHAPj/AgAAAAAAAAAGAPj/AgAAAAAAAAAFAPj/AgAAAAAAAAAEAPj/AgAAAAAAAAADAPj/AgAAAAAAAAACAPj/AgAAAAAAAAABAPj/AgAAAAAAAAAAAPj/AgAAAAAAAAD///j/AgAAAAAAAAD+//j/AgAAAAAAAAD9//j/AgAAAAAAAAD8//j/AgAAAAAAAAD7//j/AgAAAAAAAAD6//j/AgAAAAAAAAD5//j/AgAAAAAAAAD5/wQAAwAAAAAAAAD5/wUAAwAAAAEAAAD6/wQAAwABAAAAAAD6/wUAAwABAAEAAAD6/wYAAwABAAIAAAD7/wUAAwACAAEAAAD7/wYAAwACAAIAAAAEAPn/AwAAAAAAAAAEAPr/AwAAAAEAAAAFAPn/AwABAAAAAAAFAPr/AwABAAEAAAAFAPv/AwABAAIAAAAGAPr/AwACAAEAAAAGAPv/AwACAAIAAAD7//n/AwACAAIAAGD7//r/AwABAAIAAGD6//n/AwACAAEAAGD6//r/AwABAAEAAGD6//v/AwAAAAEAAGD5//r/AwABAAAAAGD5//v/AwAAAAAAAGAGAAQAAwACAAIAAGAGAAUAAwABAAIAAGAFAAQAAwACAAEAAGAFAAUAAwABAAEAAGAFAAYAAwAAAAEAAGAEAAUAAwABAAAAAGAEAAYAAwAAAAAAAGD5/wYAAgAAAAAAAAAGAAYAAgAAAAAAAAAGAPn/AgAAAAAAAAD5//n/AgAAAAAAAAA=")
-tile_set = SubResource("TileSet_vwb7u")
+tile_set = ExtResource("3_ilclh")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false

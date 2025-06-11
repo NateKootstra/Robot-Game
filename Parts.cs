@@ -14,16 +14,6 @@ public partial class Parts : Node
         (int)(TileSetAtlasSource.TransformTranspose + TileSetAtlasSource.TransformFlipV)
     ];
 
-    // Bindings should look like these:
-    // Trigger Speed     =  Number 0
-    // Memory  AND       =  Number 0
-    // Key    W   = Number 1 -> Trigger Speed     += Number 1
-    // Key    S   = Number 1 -> Trigger Speed     -= Number 1
-    // Key    H   = Number 0 -> Memory  AND       += Number 1
-    // Key    J   = Number 0 -> Memory  AND       += Number 1
-    // Memory AND < Number 2 -> Memory  AND       =  Number 0
-    // Memory AND = Number 2 -> Memory  AND       =  Number 1
-    // Memory AND = Key    R -> Trigger Direction =  Number 360
     public class Binding()
     {
         public static readonly List<string> typeOptions = [
@@ -45,25 +35,30 @@ public partial class Parts : Node
                 List<double> values = [];
                 for (int i = 0; i < 4; i++)
                 {
-                    if (!(i == 2))
-                        switch (types[i])
-                        {
-                            case 0:
-                                values.Add(Robots.list[robotIndex].memory[inputs[i]]);
-                                break;
-                            case 1:
-                                values.Add(Robots.list[robotIndex].parts[partIndex].triggers[inputs[i]][2]);
-                                break;
-                            case 2:
-                                values.Add(double.Parse(inputs[i], System.Globalization.CultureInfo.InvariantCulture));
-                                break;
-                            case 3:
-                                if (Input.IsPhysicalKeyPressed(OS.FindKeycodeFromString(inputs[i])))
-                                    values.Add(1d);
-                                else
-                                    values.Add(0d);
-                                break;
-                        }
+                    if (comparison || (!comparison && (i > 1)))
+                    {
+                        if (!(i == 2))
+                            switch (types[i])
+                            {
+                                case 0:
+                                    values.Add(Robots.list[robotIndex].memory[inputs[i]]);
+                                    break;
+                                case 1:
+                                    values.Add(Robots.list[robotIndex].parts[partIndex].triggers[inputs[i]][2]);
+                                    break;
+                                case 2:
+                                    values.Add(double.Parse(inputs[i], System.Globalization.CultureInfo.InvariantCulture));
+                                    break;
+                                case 3:
+                                    if (Input.IsPhysicalKeyPressed(OS.FindKeycodeFromString(inputs[i])))
+                                        values.Add(1d);
+                                    else
+                                        values.Add(0d);
+                                    break;
+                            }
+                    }
+                    else
+                        values.Add(-1);
                 }
                 if (comparison)
                 {
@@ -273,11 +268,14 @@ public partial class Parts : Node
             List<Binding> bindings = [];
             foreach (var bindingDict in data.AsGodotDictionary()["bindings"].AsGodotArray())
             {
-                bindings.Add(new());
-                bindings[^1].comparison = (Boolean)bindingDict.AsGodotDictionary()["comparison"];
-                bindings[^1].types = [.. bindingDict.AsGodotDictionary()["types"].AsInt32Array()];
-                bindings[^1].inputs = [.. bindingDict.AsGodotDictionary()["inputs"].AsStringArray()];
-                bindings[^1].operands = [.. bindingDict.AsGodotDictionary()["operands"].AsStringArray()];
+                if (bindingDict.AsGodotDictionary()["types"].AsInt32Array().Length > 0)
+                {
+                    bindings.Add(new());
+                    bindings[^1].comparison = (Boolean)bindingDict.AsGodotDictionary()["comparison"];
+                    bindings[^1].types = [.. bindingDict.AsGodotDictionary()["types"].AsInt32Array()];
+                    bindings[^1].inputs = [.. bindingDict.AsGodotDictionary()["inputs"].AsStringArray()];
+                    bindings[^1].operands = [.. bindingDict.AsGodotDictionary()["operands"].AsStringArray()];
+                }
             }
             newPart.Add(bindings);
             return newPart;
@@ -293,6 +291,16 @@ public partial class Parts : Node
         }},
         {"SwerveModuleOnTick", delegate(Part self, int robotID, ArrayList args) {
             int cooldown = 1;
+
+            Robots.list[robotID].privateMemory["totalFx"] = 0.0;
+            Robots.list[robotID].privateMemory["totalFy"] = 0.0;
+            Robots.list[robotID].privateMemory["totalTau"] = 0.0;
+            double θ = (Math.PI / 180) * self.triggers["Dir"][2];
+            double fx = self.triggers["Speed"][2] * Math.Sin(θ);
+            double fy = -self.triggers["Speed"][2] * Math.Cos(θ);
+            Robots.list[robotID].privateMemory["totalFx"] += fx;
+            Robots.list[robotID].privateMemory["totalFy"] += fy;
+            Robots.list[robotID].privateMemory["totalTau"] += (float)self.location.X * fy - (float)self.location.Y * fx;
 
             self.tickCooldown = cooldown;
         }},

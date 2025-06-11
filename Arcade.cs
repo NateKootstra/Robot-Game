@@ -1,57 +1,87 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class Arcade : Node2D
 {
-    //     TileMapLayer map;
-
-    //     Vector2 velocity = new(0, 0);
-    //     double rotationalVelocity = 0;
-
-    //     public static List<Double> CalculateDrive(List<List<double>> wheels, double mass)
-    //     {
-    //         double totalFx = 0.0;
-    //         double totalFy = 0.0;
-    //         double totalTau = 0.0;
-
-    //         for (int i = 0; i < wheels.Count; i++)
-    //         {
-    //             List<Double> output = CalculateWheel(new Vector2((float)wheels[i][0], (float)wheels[i][1]), wheels[i][2], wheels[i][3]);
-    //             totalFx += output[0];
-    //             totalFy += output[1];
-    //             totalTau += output[2];
-    //         }
-
-    //         double dx = totalFx / mass;
-    //         double dy = totalFy / mass;
-    //         double dTheta = totalTau / mass;
-
-    //         return [dx, dy, dTheta];
-    //     }
+    public Robots.Robot self = Robots.list[0];
 
 
-    //     public override void _Ready()
-    //     {
-    //         map = this.GetChild<TileMapLayer>(0);
-    //     }
+    public void UpdateRobot()
+    {
+        self.map.Clear();
+        for (int i = 0; i < self.parts.Count; i++)
+        {
+            for (int i2 = 0; i2 < self.parts[i].GetPoints().Count; i2++)
+            {
+                self.map.SetCell(self.parts[i].location + self.parts[i].GetPoints()[i2] - self.parts[i].origin, self.parts[i].id, self.parts[i].points[i2], Parts.rotations[self.parts[i].rotation]);
+            }
+        }
+    }
 
-    //     public override void _Process(double delta)
-    //     {
-    //         double speed = 0;
+    public override void _Ready()
+    {
+        self.bot = this;
+        self.map = this.GetChild<TileMapLayer>(0);
 
-    //         List<List<double>> wheels = [];
-    //         var swerveTiles = map.GetUsedCellsById(3);
-    //         for (int i = 0; i < swerveTiles.Count; i++)
-    //         {
-    //             Vector2I atlasCoords = map.GetCellAtlasCoords(swerveTiles[i]);
-    //             if (atlasCoords == new Vector2I(1, 1))
-    //                 wheels.Add([swerveTiles[i].X + 0.5, swerveTiles[i].Y + 0.5, 0, speed]);
-    //         }
-    //         List<double> displacement = CalculateDrive(wheels, 1);
-    //         velocity = new((float)displacement[0], (float)displacement[1]);
-    //         rotationalVelocity = displacement[2];
-    //         this.Position += velocity;
-    //         this.RotationDegrees += (float)rotationalVelocity;
-    //     }
+        string selectedRobot = "";
+        DirAccess userFolder = DirAccess.Open("user://");
+        Godot.FileAccess userDataRead = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
+        if (!userFolder.GetFiles().Contains("user.dat") || !userDataRead.GetAsText().Contains("selectedRobot"))
+        {
+            DirAccess.CopyAbsolute("res://Kitbot.robot", "user://robots/Kitbot.robot");
+            Godot.FileAccess userData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Write);
+            userData.StoreLine("selectedRobot=Kitbot");
+            userData.Close();
+        }
+        userDataRead.Close();
+        Godot.FileAccess confirmedUserData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
+        string[] points = confirmedUserData.GetAsText().Split(",\n");
+        foreach (string point in points)
+            if (point.Split("=")[0] == "selectedRobot")
+                selectedRobot = point.Split("=")[1].Trim();
+        confirmedUserData.Close();
+
+        Godot.FileAccess botRead = Godot.FileAccess.Open("user://robots/" + selectedRobot + ".robot", Godot.FileAccess.ModeFlags.Read);
+        string text = botRead.GetAsText().TrimPrefix("[").TrimSuffix("\n").TrimSuffix("]");
+        botRead.Close();
+        string[] partList = text.Split("},{\"id");
+        for (int i = 0; i < partList.Length; i++)
+        {
+            if (!partList[i].StartsWith('{'))
+                partList[i] = "{\"id" + partList[i];
+            if (!partList[i].EndsWith('}'))
+                partList[i] = partList[i] + "}";
+        }
+        self.parts = [];
+        foreach (string partString in partList)
+        {
+            self.parts.Add(new Parts.Part(partString));
+        }
+        UpdateRobot();
+    }
+
+    public override void _Process(double delta)
+    {
+        for (int i = 0; i < self.parts.Count; i++)
+            foreach (Parts.Binding binding in self.parts[i].bindings)
+                binding.RunBinding(0, i);
+        for (int i = 0; i < self.parts.Count; i++)
+            foreach (string key in self.parts[i].triggers.Keys)
+            {
+
+                self.parts[i].triggers[key][2] = self.parts[i].triggers[key][2] > self.parts[i].triggers[key][0] ? self.parts[i].triggers[key][2] : self.parts[i].triggers[key][0];
+                self.parts[i].triggers[key][2] = self.parts[i].triggers[key][2] < self.parts[i].triggers[key][1] ? self.parts[i].triggers[key][2] : self.parts[i].triggers[key][1];
+            }
+        foreach (Parts.Part part in self.parts)
+            Parts.tickActions[part.onTick](part, 0, []);
+
+        try
+        {
+            self.bot.Position += new Vector2((float)self.privateMemory["totalFx"], (float)self.privateMemory["totalFy"]);
+            self.bot.RotationDegrees += (float)self.privateMemory["totalTau"];
+        }
+        catch { }
+    }
 }
