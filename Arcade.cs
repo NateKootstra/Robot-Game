@@ -64,6 +64,8 @@ public partial class Arcade : Node2D
 
     public override void _Process(double delta)
     {
+        PreParts();
+
         for (int i = 0; i < self.parts.Count; i++)
             foreach (Parts.Binding binding in self.parts[i].bindings)
                 binding.RunBinding(0, i);
@@ -77,6 +79,18 @@ public partial class Arcade : Node2D
         foreach (Parts.Part part in self.parts)
             Parts.tickActions[part.onTick](part, 0, []);
 
+        PostParts();
+    }
+
+    public void PreParts()
+    {
+        Robots.list[0].privateMemory["totalFx"] = 0.0;
+        Robots.list[0].privateMemory["totalFy"] = 0.0;
+        Robots.list[0].privateMemory["totalTau"] = 0.0;
+    }
+
+    public void PostParts()
+    {
         try
         {
             self.bot.Position += new Vector2((float)self.privateMemory["totalFx"], (float)self.privateMemory["totalFy"]);

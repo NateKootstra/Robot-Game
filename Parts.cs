@@ -292,15 +292,12 @@ public partial class Parts : Node
         {"SwerveModuleOnTick", delegate(Part self, int robotID, ArrayList args) {
             int cooldown = 1;
 
-            Robots.list[robotID].privateMemory["totalFx"] = 0.0;
-            Robots.list[robotID].privateMemory["totalFy"] = 0.0;
-            Robots.list[robotID].privateMemory["totalTau"] = 0.0;
             double θ = (Math.PI / 180) * self.triggers["Dir"][2];
             double fx = self.triggers["Speed"][2] * Math.Sin(θ);
             double fy = -self.triggers["Speed"][2] * Math.Cos(θ);
             Robots.list[robotID].privateMemory["totalFx"] += fx;
             Robots.list[robotID].privateMemory["totalFy"] += fy;
-            Robots.list[robotID].privateMemory["totalTau"] += (float)self.location.X * fy - (float)self.location.Y * fx;
+            Robots.list[robotID].privateMemory["totalTau"] += ((float)self.location.X + 0.5) * fy - ((float)self.location.Y + 0.5) * fx;
 
             self.tickCooldown = cooldown;
         }},
