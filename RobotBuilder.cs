@@ -134,6 +134,8 @@ public partial class RobotBuilder : Node2D
     public void IncrementOperand1(int index)
     {
         if (viewedPart.bindings[index].operands[0] == "==")
+            viewedPart.bindings[index].operands[0] = "!=";
+        else if (viewedPart.bindings[index].operands[0] == "!=")
             viewedPart.bindings[index].operands[0] = ">";
         else if (viewedPart.bindings[index].operands[0] == ">")
             viewedPart.bindings[index].operands[0] = "<";

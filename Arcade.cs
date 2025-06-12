@@ -81,7 +81,6 @@ public partial class Arcade : Node2D
 
         PostParts();
     }
-
     public void PreParts()
     {
         Robots.list[0].privateMemory["totalFx"] = 0.0;
@@ -93,7 +92,27 @@ public partial class Arcade : Node2D
     {
         try
         {
-            self.bot.Position += new Vector2((float)self.privateMemory["totalFx"], (float)self.privateMemory["totalFy"]);
+            self.bot.Position += new Vector2((float)self.privateMemory["totalFx"] * 2, (float)self.privateMemory["totalFy"] * 2);
+            foreach (Vector2I cell in self.map.GetUsedCells())
+            {
+                Vector2 coords = self.map.ToGlobal(self.map.MapToLocal(cell));
+                if (coords.Y < 160)
+                {
+                    self.bot.Position -= new Vector2(0, coords.Y - 160);
+                }
+                else if (coords.Y > 1037.6f)
+                {
+                    self.bot.Position -= new Vector2(0, coords.Y - 1037.6f);
+                }
+                if (coords.X < 72)
+                {
+                    self.bot.Position -= new Vector2(coords.X - 72, 0);
+                }
+                else if (coords.X > 1846.6)
+                {
+                    self.bot.Position -= new Vector2(coords.X - 1846.6f, 0);
+                }
+            }
             self.bot.RotationDegrees += (float)self.privateMemory["totalTau"];
         }
         catch { }

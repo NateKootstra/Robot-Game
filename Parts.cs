@@ -68,6 +68,9 @@ public partial class Parts : Node
                         case "==":
                             comparisonResult = values[0] == values[1];
                             break;
+                        case "!=":
+                            comparisonResult = values[0] != values[1];
+                            break;
                         case ">":
                             comparisonResult = values[0] > values[1];
                             break;
@@ -158,8 +161,9 @@ public partial class Parts : Node
                         break;
                 }
             }
-            catch
+            catch (Exception e)
             {
+                GD.PrintErr(e);
                 return;
             }
         }
@@ -191,15 +195,17 @@ public partial class Parts : Node
             partList[(int)Part.FromJSON(json)[0]].origin,
             partList[(int)Part.FromJSON(json)[0]].points,
             partList[(int)Part.FromJSON(json)[0]].weight,
-            partList[(int)Part.FromJSON(json)[0]].triggers,
+            GetTriggers(partList[(int)Part.FromJSON(json)[0]].triggers),
             partList[(int)Part.FromJSON(json)[0]].onTick
             )
         {
+
             location = (Vector2I)Part.FromJSON(json)[1];
             rotation = (int)Part.FromJSON(json)[2];
             linkingGroups = (List<int>)Part.FromJSON(json)[3];
             bindings = (List<Binding>)Part.FromJSON(json)[4];
         }
+
         public List<Vector2I> GetPoints()
         {
             Vector2I max = new(0, 0);
@@ -280,6 +286,16 @@ public partial class Parts : Node
             newPart.Add(bindings);
             return newPart;
         }
+
+        private static Dictionary<string, List<double>> GetTriggers(Dictionary<string, List<double>> presetTriggers)
+        {
+            Dictionary<string, List<double>> triggers = [];
+            foreach (string key in presetTriggers.Keys)
+            {
+                triggers.Add(key, [presetTriggers[key][0], presetTriggers[key][1], presetTriggers[key][2]]);
+            }
+            return triggers;
+        }
     }
 
 
@@ -291,7 +307,6 @@ public partial class Parts : Node
         }},
         {"SwerveModuleOnTick", delegate(Part self, int robotID, ArrayList args) {
             int cooldown = 1;
-
             double θ = (Math.PI / 180) * self.triggers["Dir"][2];
             double fx = self.triggers["Speed"][2] * Math.Sin(θ);
             double fy = -self.triggers["Speed"][2] * Math.Cos(θ);
