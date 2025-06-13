@@ -27,15 +27,23 @@ public partial class Arcade : Node2D
 
         string selectedRobot = "";
         DirAccess userFolder = DirAccess.Open("user://");
-        Godot.FileAccess userDataRead = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
-        if (!userFolder.GetFiles().Contains("user.dat") || !userDataRead.GetAsText().Contains("selectedRobot"))
+        if (!userFolder.DirExists("robots"))
+            userFolder.MakeDir("robots");
+        bool isRobotSelected = false;
+        try
+        {
+            Godot.FileAccess userDataRead = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
+            isRobotSelected = userDataRead.GetAsText().Contains("selectedRobot");
+            userDataRead.Close();
+        }
+        catch { };
+        if (!userFolder.GetFiles().Contains("user.dat") || !isRobotSelected)
         {
             DirAccess.CopyAbsolute("res://Kitbot.robot", "user://robots/Kitbot.robot");
             Godot.FileAccess userData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Write);
             userData.StoreLine("selectedRobot=Kitbot");
             userData.Close();
         }
-        userDataRead.Close();
         Godot.FileAccess confirmedUserData = Godot.FileAccess.Open("user://user.dat", Godot.FileAccess.ModeFlags.Read);
         string[] points = confirmedUserData.GetAsText().Split(",\n");
         foreach (string point in points)

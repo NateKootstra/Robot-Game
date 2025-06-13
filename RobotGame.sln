@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "That-s not legal!", "That-s not legal!.csproj", "{5320810A-31BA-4B2B-82B4-8A44B93BA8B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotGame", "RobotGame.csproj", "{5320810A-31BA-4B2B-82B4-8A44B93BA8B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

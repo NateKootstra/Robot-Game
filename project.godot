@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="Competition Legal"
-config/version="v0"
+config/name="RobotGame"
+config/version="v1"
 run/main_scene="uid://dg6ecfu3eejrn"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 boot_splash/bg_color=Color(0, 0, 0, 1)
@@ -31,7 +31,7 @@ window/stretch/mode="canvas_items"
 
 [dotnet]
 
-project/assembly_name="That-s not legal!"
+project/assembly_name="RobotGame"
 
 [gui]
 

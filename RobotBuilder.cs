@@ -183,6 +183,7 @@ public partial class RobotBuilder : Node2D
         Godot.FileAccess bot = Godot.FileAccess.Open("user://robots/" + robotDropdown.Text + ".robot", Godot.FileAccess.ModeFlags.Write);
         bot.StoreLine(JsonSerializer.Serialize(data));
         bot.Close();
+        GetTree().ChangeSceneToFile("res://Menu.tscn");
     }
 
     public void Load()
